@@ -1,0 +1,36 @@
+{
+  "name": "@pjqdyd/use-timer",
+  "version": "1.0.0",
+  "description": "The hooks of setTimeout and setInterval",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "server": "npm run dev",
+    "dev": "tsc",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint \"src/**/*.{vue,ts,tsx}\" --fix",
+    "release": "tsc && npm publish"
+  },
+  "keywords": [],
+  "author": "pjqdyd",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pjqdyd/use-timer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pjqdyd/use-timer/issues"
+  },
+  "homepage": "https://github.com/pjqdyd/use-timer#readme",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.28.0",
+    "@typescript-eslint/parser": "^5.28.0",
+    "eslint": "^7.23.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "prettier": "^2.7.1",
+    "typescript": "^4.7.3"
+  }
+}
