@@ -1,5 +1,4 @@
-export const Greeter = (name: string) => `Hello ${name}`
+import { useTimeout } from './hooks/timeout/useTimeout'
+import { useInterval } from './hooks/interval/useInterval'
 
-function f() {
-    const a = 'x'
-}
+export { useTimeout, useInterval }
