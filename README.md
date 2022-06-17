@@ -3,7 +3,7 @@
 
 <h2 align="middle">npm-ts-demo</h2>
 <p align="middle">
-    <a href="https://www.npmjs.com/package/@pjqdyd/use-hooks" target="_blank">
+    <a href="https://www.npmjs.com/package/@pjqdyd/npm-ts-demo" target="_blank">
         <img src="https://badgen.net/badge/version/v1.0.3"/>
     </a>
     <img src="https://badgen.net/badge/language/typescript/cyan"/>
