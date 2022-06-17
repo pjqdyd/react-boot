@@ -19,7 +19,7 @@
 #### Background：
  此项目并没有什么内容，只是一个发布npm包的示例ts项目.
 
-***
+---
 
 #### Install：
 ```
@@ -39,14 +39,16 @@ const version = getVersion();
 console.log('项目版本号：', version)
 ```
 
-***
+---
+
 #### All Methods：
  * **getVersion** 获取项目版本号
  * **getPackageName** 获取项目名称
  * ...
  * ed: 等待后续添加更多 (欢迎pr) ...
 
-***
+---
+
 #### How to publish npm:
 ```
 npm run build
@@ -57,12 +59,13 @@ npm login
 npm publish --access public
 ```
 
-***
+---
+
 #### How to update npm:
 1. change the version.
 2. build.
 3. npm publish.
 
-***
+---
 #### License
 This project is licensed under the [MIT](https://github.com/pjqdyd/npm-ts-demo/blob/master/LICENSE) license.
