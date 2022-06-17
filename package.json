@@ -1,6 +1,6 @@
 {
   "name": "@pjqdyd/npm-ts-demo",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "The demo project of npm typescript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,11 +9,14 @@
     "server": "npm run dev",
     "dev": "tsc",
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "lint": "eslint \"src/**/*.{vue,ts,tsx}\" --fix",
     "release": "tsc && npm publish"
   },
-  "keywords": ["npm", "typescript"],
+  "keywords": [
+    "npm",
+    "typescript"
+  ],
   "author": "pjqdyd",
   "license": "MIT",
   "repository": {
@@ -25,12 +28,15 @@
   },
   "homepage": "https://github.com/pjqdyd/npm-ts-demo#readme",
   "devDependencies": {
+    "@types/jest": "^28.1.1",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
     "eslint": "^7.23.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.1",
+    "jest": "^28.1.1",
     "prettier": "^2.7.1",
+    "ts-jest": "^28.0.5",
     "typescript": "^4.7.3"
   }
 }

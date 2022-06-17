@@ -4,9 +4,10 @@
 <h2 align="middle">npm-ts-demo</h2>
 <p align="middle">
     <a href="https://www.npmjs.com/package/@pjqdyd/npm-ts-demo" target="_blank">
-        <img src="https://badgen.net/badge/version/v1.0.3"/>
+        <img src="https://badgen.net/badge/version/v1.0.4"/>
     </a>
     <img src="https://badgen.net/badge/language/typescript/cyan"/>
+    <img src="https://badgen.net/badge/test/jest/blue"/>
     <img src="https://badgen.net/badge/package/npm/blue"/>
     <img src="https://badgen.net/badge/license/MIT/green"/>
     <img src="https://badgen.net/badge/contributors/1/blue"/>
