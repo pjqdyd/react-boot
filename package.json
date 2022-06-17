@@ -1,7 +1,7 @@
 {
-  "name": "@pjqdyd/use-hooks",
-  "version": "1.0.0",
-  "description": "The useful hooks collection",
+  "name": "@pjqdyd/npm-ts-demo",
+  "version": "1.0.3",
+  "description": "The demo project of npm typescript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": ["dist"],
@@ -13,17 +13,17 @@
     "lint": "eslint \"src/**/*.{vue,ts,tsx}\" --fix",
     "release": "tsc && npm publish"
   },
-  "keywords": ["hooks", "typescript"],
+  "keywords": ["npm", "typescript"],
   "author": "pjqdyd",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pjqdyd/use-hooks.git"
+    "url": "git+https://github.com/pjqdyd/npm-ts-demo.git"
   },
   "bugs": {
-    "url": "https://github.com/pjqdyd/use-hooks/issues"
+    "url": "https://github.com/pjqdyd/npm-ts-demo/issues"
   },
-  "homepage": "https://github.com/pjqdyd/use-hooks#readme",
+  "homepage": "https://github.com/pjqdyd/npm-ts-demo#readme",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",

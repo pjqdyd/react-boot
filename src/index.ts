@@ -1,4 +1,7 @@
-import { useTimeout } from './hooks/timeout/useTimeout'
-import { useInterval } from './hooks/interval/useInterval'
+/**
+ * 主文件
+ */
 
-export { useTimeout, useInterval }
+import { getVersion, getPackageName } from '@/utils/index'
+
+export { getVersion, getPackageName }
