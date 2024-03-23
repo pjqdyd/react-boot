@@ -1,7 +1,6 @@
 /**
  * 主文件
  */
+import ReactBoot from './lib'
 
-import { getVersion, getPackageName } from './utils/index'
-
-export { getVersion, getPackageName }
+export default ReactBoot

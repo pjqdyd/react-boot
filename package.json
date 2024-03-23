@@ -1,14 +1,17 @@
 {
-  "name": "@pjqdyd/npm-ts-demo",
+  "name": "@pjqdyd/react-boot",
   "version": "1.0.4",
-  "description": "The demo project of npm typescript",
+  "description": "The react boot of npm typescript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "server": "npm run dev",
     "dev": "tsc",
     "build": "tsc",
+    "build-declaration": "tsc --declaration",
     "test": "jest",
     "lint": "eslint \"src/**/*.{vue,ts,tsx}\" --fix",
     "release": "tsc && npm publish"
@@ -21,12 +24,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pjqdyd/npm-ts-demo.git"
+    "url": "git+https://github.com/pjqdyd/react-boot.git"
   },
   "bugs": {
-    "url": "https://github.com/pjqdyd/npm-ts-demo/issues"
+    "url": "https://github.com/pjqdyd/react-boot/issues"
   },
-  "homepage": "https://github.com/pjqdyd/npm-ts-demo#readme",
+  "homepage": "https://github.com/pjqdyd/react-boot#readme",
   "devDependencies": {
     "@types/jest": "^28.1.1",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
