@@ -11,7 +11,7 @@
     "server": "npm run dev",
     "dev": "tsc",
     "build": "tsc",
-    "build-declaration": "tsc --declaration",
+    "build-type": "tsc --declaration",
     "test": "jest",
     "lint": "eslint \"src/**/*.{vue,ts,tsx}\" --fix",
     "release": "tsc && npm publish"

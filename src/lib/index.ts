@@ -1,5 +1,5 @@
-export default {
-    a: () => {
-        console.log('a')
-    },
-}
+import { a } from './common'
+
+export type { CommonType } from './common'
+
+export { a }
