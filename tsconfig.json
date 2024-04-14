@@ -5,14 +5,12 @@
     "lib": ["esnext", "es2017", "es7", "es6", "dom"],
     "declaration": true,
     "outDir": "dist",
-    "types": ["jest"],
+    "types": ["node","jest"],
     "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    },
     "strict": true,
     "esModuleInterop": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "experimentalDecorators": true
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx"],
   "exclude": ["node_modules", "dist", "test"]
