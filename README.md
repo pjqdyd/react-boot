@@ -32,7 +32,7 @@ yarn add @pjqdyd/ract-boot
 
 #### How to use：
 ```
-// todo
+// todo update 
 ```
 
 ---
