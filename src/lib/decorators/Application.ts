@@ -17,7 +17,7 @@ const Application = (params: ApplicationParams) => {
             return reactBoot
         } catch (e) {
             removeApp({ name })
-            log(`${name}-Application register success: ${e}`, 'error')
+            log(`${name}-Application register fail: ${e}`, 'error')
         }
     }
 }
