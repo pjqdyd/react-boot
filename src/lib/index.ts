@@ -1,5 +1,5 @@
 import Application from './decorators/Application'
-import ReactBoot from './interface/ReactBoot'
+import type { ReactBoot } from './interface'
 
 export * from './types'
 

@@ -1,4 +1,4 @@
-import { createApp, version } from '../common'
+import { registerApp, removeApp, log } from '../core'
 import { ApplicationParams, ReactBootClass } from '../types'
 
 /**
@@ -6,13 +6,19 @@ import { ApplicationParams, ReactBootClass } from '../types'
  * @param params
  */
 const Application = (params: ApplicationParams) => {
-    const { name } = { ...params }
-    return (target?: ReactBootClass, className?: string, descriptor?: PropertyDescriptor) => {
+    const { name, description } = { ...params }
+    return (target?: ReactBootClass, className?: string) => {
         if (!target) return
-        const app = new target()
-        createApp({ name, app, className, descriptor })
-        app.run()
-        console.log(`ReactBoot ${version} 应用注册成功：`, name)
+        try {
+            const reactBoot = new target()
+            registerApp({ name, reactBoot, className, description })
+            reactBoot.run()
+            log(`${name}-Application register success`)
+            return reactBoot
+        } catch (e) {
+            removeApp({ name })
+            log(`${name}-Application register success: ${e}`, 'error')
+        }
     }
 }
 
