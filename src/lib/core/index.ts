@@ -24,7 +24,7 @@ export const root: any = window || globalThis || global || self || {}
  * @param type
  */
 export const log = (msg: string, type: 'log' | 'warn' | 'error' = 'log') => {
-    console[type](`ReactBoot ${version}: `, msg)
+    console[type]?.(`ReactBoot ${version}: `, msg)
 }
 
 /**
