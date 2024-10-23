@@ -6,6 +6,11 @@ export interface ReactBoot {
      * 启动方法
      */
     run(): void
+
+    /**
+     * 销毁方法
+     */
+    destroy?: () => void
 }
 
 /**
@@ -36,7 +41,7 @@ export interface App {
     name: string
 
     /** 启动应用实例 */
-    reactBoot?: ReactBoot
+    reactBoot: ReactBoot
 
     /** 应用类名 */
     className?: string

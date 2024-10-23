@@ -6,7 +6,7 @@ import type { App, Component, ReactBoot } from '../interface'
 class AppClass implements App {
     name: string
     description?: string
-    reactBoot?: ReactBoot
+    reactBoot: ReactBoot
     components: Map<string, Component>
 
     constructor(params: App) {

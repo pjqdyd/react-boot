@@ -56,13 +56,30 @@ export const registerApp = (params: App) => {
 }
 
 /**
+ * 绑定销毁事件
+ * @param params
+ */
+export const bindDestroy = (params: App) => {
+    const { reactBoot } = params
+    const destroy = reactBoot.destroy?.bind(this)
+    reactBoot.destroy = () => {
+        destroy?.()
+        removeApp(params)
+        log(`[${params.name}] Application destroy success`)
+    }
+}
+
+/**
  * 获取IOC中的应用
  * @param params
  */
-export const getApp = (params: App) => {
+export const getApp = (params: Partial<App>) => {
     const { name } = params
+    if (!name) {
+        throw new ReactBootError('@Application App name is required')
+    }
     if (!ioc.has(name)) {
-        log(`App ${name} is not found`, 'warn')
+        log(`[${name}] is not found`, 'warn')
         return null
     }
     return ioc.get(name)
@@ -72,7 +89,7 @@ export const getApp = (params: App) => {
  * 从IOC容器删除应用
  * @param params
  */
-export const removeApp = (params: App) => {
+export const removeApp = (params: Partial<App>) => {
     const { name } = params
     if (!name) {
         throw new ReactBootError('@Application App name is required')
