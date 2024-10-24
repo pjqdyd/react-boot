@@ -1,7 +1,7 @@
 /**
  * 启动类的接口
  */
-export interface ReactBoot {
+export interface ReactBootApplication {
     /**
      * 启动方法
      */
@@ -41,7 +41,7 @@ export interface App {
     name: string
 
     /** 启动应用实例 */
-    reactBoot: ReactBoot
+    reactBoot: ReactBootApplication
 
     /** 应用类名 */
     className?: string
