@@ -44,10 +44,10 @@ export const ioc = (() => {
 export const registerApp = (params: App) => {
     const { name } = params
     if (!name) {
-        throw new ReactBootError('@Application App name is required')
+        throw new ReactBootError('App name is required')
     }
     if (ioc.has(name)) {
-        throw new ReactBootError(`@Application App name is must be unique`)
+        throw new ReactBootError(`App name is must be unique`)
     }
     if (!ioc.has(name)) {
         ioc.set(name, new AppClass(params))
@@ -76,7 +76,7 @@ export const bindDestroy = (params: App) => {
 export const getApp = (params: Partial<App>) => {
     const { name } = params
     if (!name) {
-        throw new ReactBootError('@Application App name is required')
+        throw new ReactBootError('App name is required')
     }
     if (!ioc.has(name)) {
         log(`[${name}] is not found`, 'warn')
@@ -92,7 +92,7 @@ export const getApp = (params: Partial<App>) => {
 export const removeApp = (params: Partial<App>) => {
     const { name } = params
     if (!name) {
-        throw new ReactBootError('@Application App name is required')
+        throw new ReactBootError('App name is required')
     }
     return ioc.delete(name)
 }
