@@ -1,4 +1,4 @@
-import type { App, Component, ReactBoot } from '../interface'
+import type { App, Component, ReactBootApplication } from '../interface'
 
 /**
  * 应用类
@@ -6,7 +6,7 @@ import type { App, Component, ReactBoot } from '../interface'
 class AppClass implements App {
     name: string
     description?: string
-    reactBoot: ReactBoot
+    reactBoot: ReactBootApplication
     components: Map<string, Component>
 
     constructor(params: App) {
