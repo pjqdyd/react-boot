@@ -7,8 +7,16 @@ import { ApplicationParams, ReactBootClass } from '../types'
  */
 const Application = (params: ApplicationParams) => {
     const { name, description } = { ...params }
-    return (target?: ReactBootClass, className?: string) => {
-        if (!target) return
+    return (target?: ReactBootClass | ApplicationParams, className?: string) => {
+        if (!target || typeof target === 'object') {
+            // 使用装饰器时携带了参数 @Application({...})
+            return Application({ ...params, ...(target || {}) })
+        }
+        if (!target || typeof target !== 'function') {
+            // 未正确使用装饰器
+            return log(`[${name}] @Application should be used on the class function`, 'error')
+        }
+        // 直接使用装饰器 @Application
         try {
             const reactBoot = new target()
             // 注册应用

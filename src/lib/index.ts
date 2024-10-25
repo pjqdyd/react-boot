@@ -10,10 +10,10 @@ import type { ApplicationParams } from './types'
  */
 const ReactBoot = (appParams: ApplicationParams) => {
     return {
-        Application: (params?: Partial<ApplicationParams>) => Application({ ...appParams, ...(params || {}) }),
+        Application: Application(appParams),
         Provider: () => null,
         Consumer: () => null,
-        createApp: (params?: Partial<ApplicationParams>) => createApp({ ...appParams, ...(params || {}) }),
+        createApp: createApp(appParams),
     }
 }
 
