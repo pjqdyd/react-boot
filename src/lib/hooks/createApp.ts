@@ -1,45 +1,36 @@
-import { bindDestroy, registerApp, log, removeApp } from '../core'
-import { ApplicationParams } from '../types'
-import { ReactBootApplication } from '../interface'
+import { bindReactBoot, log, removeApp } from '../core'
+import type { ApplicationParams } from '../types'
+import type { ReactBootApplication } from '../interface'
 
 /**
  * 应用启动类hooks
  * @param params
  */
 const createApp = (params: ApplicationParams) => {
-    const { name, description } = { ...params }
+    const { name } = { ...params }
 
-    return (
-        target?: (() => void) | ApplicationParams,
-        fun1?: () => void,
-        fun2?: () => void,
-    ): ReactBootApplication | undefined => {
-        if (!target || typeof target === 'object') {
-            // 携带参数使用 createApp({...}, function, function)
-            return createApp({ ...params, ...(target || {}) })(fun1, fun2)
-        }
-        if (!target || typeof target !== 'function') {
+    return (run?: () => void, destroy?: () => void): ReactBootApplication | undefined => {
+        if (typeof run !== 'function' || typeof destroy !== 'function') {
             // 未正确使用 createApp
-            log(`[${name}] createApp should accepted a function argument`, 'error')
+            log(`[${name.toString()}] createApp should accepted the function argument`, 'error')
             return
         }
+        // 直接使用 createApp(function, function)
         try {
-            // 直接使用 createApp(function, function)
+            // 创建启动类
             const reactBoot: ReactBootApplication = {
-                run: target,
-                destroy: fun1,
+                run: run,
+                destroy: destroy,
             }
-            // 注册应用
-            registerApp({ name, reactBoot, className: target?.name || 'Function', description })
-            // 绑定销毁事件
-            bindDestroy({ name, reactBoot })
+            // 绑定启动类
+            bindReactBoot({ name, reactBoot, className: run.name || 'Function' })
             // 运行启动方法
-            target()
-            log(`[${name}] Application register success`)
+            run()
+            // 返回实例
             return reactBoot
         } catch (e) {
             removeApp({ name })
-            log(`[${name}] Application register fail: ${e}`, 'error')
+            log(`[${name.toString()}] Application run fail: ${e}`, 'error')
         }
     }
 }

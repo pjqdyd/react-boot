@@ -1,5 +1,5 @@
 /**
- * 自定义异常
+ * ReactBoot 自定义异常
  */
 class ReactBootError extends Error {
     constructor(message: string) {

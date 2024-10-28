@@ -10,7 +10,7 @@ export type ReactBootClass = new (...args: any[]) => ReactBootApplication
  */
 export type ApplicationParams = {
     /** 应用名称 */
-    name: string
+    name: string | symbol
 
     /** 应用描述 */
     description: string
@@ -19,4 +19,4 @@ export type ApplicationParams = {
 /**
  * 应用IOC容器类型
  */
-export type IocMap = Map<string, App>
+export type IocMap = Map<string | symbol, App>

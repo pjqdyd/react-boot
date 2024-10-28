@@ -1,3 +1,5 @@
+import type { ComponentType } from 'react'
+
 /**
  * 启动类的接口
  */
@@ -5,7 +7,7 @@ export interface ReactBootApplication {
     /**
      * 启动方法
      */
-    run(): void
+    run: () => void
 
     /**
      * 销毁方法
@@ -27,7 +29,7 @@ export interface Component {
     description?: string
 
     /** 组件 */
-    component: Component | undefined
+    component: ComponentType | undefined
 
     /** 版本组件Map */
     versions: Map<string, Component>
@@ -38,10 +40,10 @@ export interface Component {
  */
 export interface App {
     /** 应用名称 */
-    name: string
+    name: string | symbol
 
     /** 启动应用实例 */
-    reactBoot: ReactBootApplication
+    reactBoot?: ReactBootApplication
 
     /** 应用类名 */
     className?: string

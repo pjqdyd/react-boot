@@ -4,9 +4,9 @@ import type { App, Component, ReactBootApplication } from '../interface'
  * 应用类
  */
 class AppClass implements App {
-    name: string
+    name: string | symbol
     description?: string
-    reactBoot: ReactBootApplication
+    reactBoot?: ReactBootApplication
     components: Map<string, Component>
 
     constructor(params: App) {

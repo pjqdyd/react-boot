@@ -1,7 +1,8 @@
 import AppClass from '../core/App'
+import Component from '../core/Component'
 import ReactBootError from '../exception'
-import { IocMap } from '../types'
-import { App } from '../interface'
+import type { ApplicationParams, IocMap } from '../types'
+import type { App } from '../interface'
 
 /**
  * 版本号
@@ -41,7 +42,7 @@ export const ioc = (() => {
  * 注册应用到IOC容器
  * @param params
  */
-export const registerApp = (params: App) => {
+export const registerApp = (params: ApplicationParams) => {
     const { name } = params
     if (!name) {
         throw new ReactBootError('App name is required')
@@ -49,23 +50,36 @@ export const registerApp = (params: App) => {
     if (ioc.has(name)) {
         throw new ReactBootError(`App name is must be unique`)
     }
-    if (!ioc.has(name)) {
-        ioc.set(name, new AppClass(params))
-    }
-    return ioc.get(name)
+    const app = new AppClass(params)
+    // 注册创建的应用
+    ioc.set(name, app)
+    // 打印日志
+    log(`[${name.toString()}] Application register success`)
+    return app
 }
 
 /**
- * 绑定销毁事件
+ * 绑定应用启动类
  * @param params
  */
-export const bindDestroy = (params: App) => {
-    const { reactBoot } = params
+export const bindReactBoot = (params: App) => {
+    const { reactBoot, className } = params
+    const app = getApp(params)
+    if (!app) {
+        throw new ReactBootError(`[${params.name.toString()}] bind App is not found`)
+    }
+    if (!reactBoot) {
+        throw new ReactBootError('bindApp reactBoot is required')
+    }
+    // 绑定启动类
+    app.reactBoot = reactBoot
+    app.className = className
+    // 绑定销毁事件
     const destroy = reactBoot.destroy?.bind(this)
     reactBoot.destroy = () => {
         destroy?.()
         removeApp(params)
-        log(`[${params.name}] Application destroy success`)
+        log(`[${params.name.toString()}] Application destroy success`)
     }
 }
 
@@ -79,7 +93,7 @@ export const getApp = (params: Partial<App>) => {
         throw new ReactBootError('App name is required')
     }
     if (!ioc.has(name)) {
-        log(`[${name}] is not found`, 'warn')
+        log(`[${name.toString()}] App is not found`, 'warn')
         return null
     }
     return ioc.get(name)
@@ -95,4 +109,54 @@ export const removeApp = (params: Partial<App>) => {
         throw new ReactBootError('App name is required')
     }
     return ioc.delete(name)
+}
+
+/**
+ * 注册组件到IOC容器
+ * @param appParams
+ * @param params
+ */
+export const registerComponent = (appParams: Partial<App>, params: any) => {
+    const { name: appName } = appParams
+    const { name: compName } = params
+    if (!appName) {
+        throw new ReactBootError('App name is required')
+    }
+    // 获取应用
+    const app = ioc.get(appName)
+    if (!app) {
+        throw new ReactBootError(`[${appName.toString()}] App is not found`)
+    }
+    // 如果组件已经存在
+    if (app?.components?.has(compName)) {
+        throw new ReactBootError(`[${compName}] Component name is must be unique`)
+    }
+    // 创建组件
+    const component = new Component({
+        name: compName,
+        component: params.component,
+        versions: new Map(),
+    })
+    // 注册组件
+    app?.components?.set(compName, component)
+
+    return component
+}
+
+/**
+ * 获取IOC中的组件
+ * @param params
+ */
+export const getComponent = (appParams: Partial<App>, params: any) => {
+    const { name: appName } = appParams
+    const { name: compName } = params
+    const app = getApp(appParams)
+    if (!app) {
+        throw new ReactBootError(`[${appName?.toString()}] App is not found`)
+    }
+    const component = app?.components?.get(compName)
+    if (!component) {
+        throw new ReactBootError(`[${appName?.toString()}]-[${compName}] Component is not found`)
+    }
+    return component
 }

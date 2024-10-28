@@ -1,4 +1,4 @@
-import { registerApp, removeApp, log, bindDestroy } from '../core'
+import { bindReactBoot, removeApp, log } from '../core'
 import { ApplicationParams, ReactBootClass } from '../types'
 
 /**
@@ -6,30 +6,29 @@ import { ApplicationParams, ReactBootClass } from '../types'
  * @param params
  */
 const Application = (params: ApplicationParams) => {
-    const { name, description } = { ...params }
-    return (target?: ReactBootClass | ApplicationParams, className?: string) => {
-        if (!target || typeof target === 'object') {
-            // 使用装饰器时携带了参数 @Application({...})
-            return Application({ ...params, ...(target || {}) })
+    const { name } = params
+    return (target?: ReactBootClass | undefined) => {
+        if (!target) {
+            // 使用装饰器 @Application()
+            return Application({ ...params })
         }
-        if (!target || typeof target !== 'function') {
+        if (typeof target !== 'function') {
             // 未正确使用装饰器
-            return log(`[${name}] @Application should be used on the class function`, 'error')
+            return log(`[${name.toString()}] @Application should be used on the class function`, 'error')
         }
         // 直接使用装饰器 @Application
         try {
+            // 创建启动类
             const reactBoot = new target()
-            // 注册应用
-            registerApp({ name, reactBoot, className, description })
-            // 绑定销毁事件
-            bindDestroy({ name, reactBoot })
+            // 绑定应用启动类
+            bindReactBoot({ name, reactBoot, className: target.name })
             // 运行启动方法
             reactBoot.run()
-            log(`[${name}] Application register success`)
+            // 返回启动类实例
             return reactBoot
         } catch (e) {
             removeApp({ name })
-            log(`[${name}] Application register fail: ${e}`, 'error')
+            log(`[${name.toString()}] Application run fail: ${e}`, 'error')
         }
     }
 }

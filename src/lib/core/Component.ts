@@ -1,3 +1,4 @@
+import type { ComponentType } from 'react'
 import type { Component } from '../interface'
 
 /**
@@ -6,13 +7,13 @@ import type { Component } from '../interface'
 class ComponentClass implements Component {
     name: string
     description?: string
-    component: Component | undefined
+    component: ComponentType | undefined
     versions: Map<string, Component>
     constructor(params: Component) {
         this.description = params.description
         this.name = params.name
         this.component = params.component
-        this.versions = params.versions
+        this.versions = params.versions || new Map()
     }
 }
 
