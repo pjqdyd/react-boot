@@ -21,13 +21,13 @@ export interface ReactBootApplication {
  */
 export interface Component {
     /** 组件名称 */
-    name: Key
+    readonly name: Key
+
+    /** 组件描述信息 */
+    readonly description?: string
 
     /** 组件类名 */
     className?: string
-
-    /** 组件描述信息 */
-    description?: string
 
     /** 组件 */
     component: ComponentType | undefined
@@ -41,16 +41,16 @@ export interface Component {
  */
 export interface App {
     /** 应用名称 */
-    name: Key
+    readonly name: Key
+
+    /** 应用描述信息 */
+    readonly description?: string
 
     /** 启动应用实例 */
     reactBoot?: ReactBootApplication
 
     /** 应用类名 */
     className?: string
-
-    /** 应用描述信息 */
-    description?: string
 
     /** 组件集合 */
     components?: Map<Key, Component>

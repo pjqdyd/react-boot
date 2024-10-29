@@ -5,8 +5,8 @@ import type { Key } from '../types'
  * 应用类
  */
 class AppClass implements App {
-    name: Key
-    description?: string
+    readonly name: Key
+    readonly description?: string
     reactBoot?: ReactBootApplication
     components: Map<Key, Component>
 

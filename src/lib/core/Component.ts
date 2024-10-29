@@ -6,8 +6,8 @@ import type { Key } from '../types'
  * 组件类
  */
 class ComponentClass implements Component {
-    name: Key
-    description?: string
+    readonly name: Key
+    readonly description?: string
     component: ComponentType | undefined
     versions: Map<Key, Component>
     constructor(params: Component) {
