@@ -1,5 +1,5 @@
 import type { ReactBootApplication, App } from '../interface'
-import type { ComponentClass as ReactComponentClass } from 'react'
+import type { ComponentClass } from 'react'
 
 /**
  * 类装饰器修饰的类型
@@ -9,12 +9,12 @@ export type Construct<T = any> = new (...args: any[]) => T
 /**
  * 装饰器修饰的启动类类型
  */
-export type ReactBootClass = Construct<ReactBootApplication>
+export type ReactBootConstruct = Construct<ReactBootApplication>
 
 /**
  * 装饰器修饰的组件类型
  */
-export type ComponentClass = Construct<ReactComponentClass>
+export type ComponentConstruct = Construct<ComponentClass>
 
 /**
  * 应用启动类装饰器参数

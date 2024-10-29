@@ -1,5 +1,5 @@
 import { bindReactBoot, removeApp, log } from '../core'
-import { ApplicationParams, ReactBootClass } from '../types'
+import { ApplicationParams, ReactBootConstruct } from '../types'
 
 /**
  * Application 应用启动类装饰器
@@ -7,7 +7,7 @@ import { ApplicationParams, ReactBootClass } from '../types'
  */
 const Application = (params: ApplicationParams) => {
     const { name } = params
-    return (target?: ReactBootClass | undefined) => {
+    return (target?: ReactBootConstruct | undefined) => {
         if (!target) {
             // 使用装饰器 @Application()
             return Application({ ...params })
