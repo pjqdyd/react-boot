@@ -1,9 +1,20 @@
 import type { ReactBootApplication, App } from '../interface'
+import type { ComponentClass as ReactComponentClass } from 'react'
 
 /**
- * 启动类类型
+ * 类装饰器修饰的类型
  */
-export type ReactBootClass = new (...args: any[]) => ReactBootApplication
+export type Construct<T = any> = new (...args: any[]) => T
+
+/**
+ * 装饰器修饰的启动类类型
+ */
+export type ReactBootClass = Construct<ReactBootApplication>
+
+/**
+ * 装饰器修饰的组件类型
+ */
+export type ComponentClass = Construct<ReactComponentClass>
 
 /**
  * 应用启动类装饰器参数
@@ -17,6 +28,11 @@ export type ApplicationParams = {
 }
 
 /**
+ * key 类型
+ */
+export type Key = string | number | symbol
+
+/**
  * 应用IOC容器类型
  */
-export type IocMap = Map<string | symbol, App>
+export type IocMap = Map<Key, App>

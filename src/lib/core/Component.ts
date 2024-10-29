@@ -1,14 +1,15 @@
 import type { ComponentType } from 'react'
 import type { Component } from '../interface'
+import type { Key } from '../types'
 
 /**
  * 组件类
  */
 class ComponentClass implements Component {
-    name: string
+    name: Key
     description?: string
     component: ComponentType | undefined
-    versions: Map<string, Component>
+    versions: Map<Key, Component>
     constructor(params: Component) {
         this.description = params.description
         this.name = params.name

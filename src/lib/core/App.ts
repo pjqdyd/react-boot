@@ -1,13 +1,14 @@
 import type { App, Component, ReactBootApplication } from '../interface'
+import type { Key } from '../types'
 
 /**
  * 应用类
  */
 class AppClass implements App {
-    name: string | symbol
+    name: Key
     description?: string
     reactBoot?: ReactBootApplication
-    components: Map<string, Component>
+    components: Map<Key, Component>
 
     constructor(params: App) {
         this.description = params.description

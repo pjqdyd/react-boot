@@ -9,7 +9,8 @@ import type { ReactBootApplication } from '../interface'
 const createApp = (params: ApplicationParams) => {
     const { name } = { ...params }
 
-    return (run?: () => void, destroy?: () => void): ReactBootApplication | undefined => {
+    return (options: ReactBootApplication): ReactBootApplication | undefined => {
+        const { run, destroy } = options
         if (typeof run !== 'function' || typeof destroy !== 'function') {
             // 未正确使用 createApp
             log(`[${name.toString()}] createApp should accepted the function argument`, 'error')
