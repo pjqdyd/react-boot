@@ -1,5 +1,5 @@
 import { registerComponent, log } from '../core'
-import { ApplicationParams, ComponentConstruct } from '../types'
+import { ApplicationParams, ComponentConstructor } from '../types'
 
 /**
  * Provider 组件提供装饰器
@@ -8,7 +8,7 @@ import { ApplicationParams, ComponentConstruct } from '../types'
  */
 const Provider = (appParams: ApplicationParams, params: any) => {
     const { name, asyncComponent } = params
-    return (target?: ComponentConstruct, className?: string, descriptor?: PropertyDescriptor) => {
+    return (target?: ComponentConstructor, className?: string, descriptor?: PropertyDescriptor) => {
         // const home = import(params.path).then((module) => {
         //     console.log('module:', module)
         // })

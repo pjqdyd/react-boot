@@ -31,6 +31,9 @@
     "url": "https://github.com/pjqdyd/react-boot/issues"
   },
   "homepage": "https://github.com/pjqdyd/react-boot#readme",
+  "dependencies": {
+    "reflect-metadata": "^0.2.2"
+  },
   "devDependencies": {
     "@types/jest": "^28.1.1",
     "@types/node": "^20.11.30",
