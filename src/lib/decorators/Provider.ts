@@ -1,5 +1,6 @@
-import { registerComponent, log } from '../core'
-import { ApplicationParams, ComponentConstructor } from '../types'
+import { registerComponent, log, REFLECT_COMPONENT_KEY } from '../core'
+import ReactBootError from '../exception'
+import type { ApplicationParams, ComponentConstructor } from '../types'
 
 /**
  * Provider 组件提供装饰器
@@ -9,16 +10,11 @@ import { ApplicationParams, ComponentConstructor } from '../types'
 const Provider = (appParams: ApplicationParams, params: any) => {
     const { name, asyncComponent } = params
     return (target?: ComponentConstructor, className?: string, descriptor?: PropertyDescriptor) => {
-        // const home = import(params.path).then((module) => {
-        //     console.log('module:', module)
-        // })
-        console.log('Provider: ', target, className, descriptor)
-        console.log('asyncComponent: ', asyncComponent)
-        setTimeout(() => {
-            asyncComponent.then((module: any) => {
-                console.log('module:', module)
-            })
-        }, 5000)
+        if (!target || typeof target !== 'function') {
+            throw new ReactBootError('@Provider target must be a class')
+        }
+        Reflect.defineMetadata(REFLECT_COMPONENT_KEY, { name }, target)
+        console.log('Provider: ', Object.prototype.toString.call(target), target, className, descriptor, asyncComponent)
         registerComponent(appParams, {
             name: name,
             component: target,

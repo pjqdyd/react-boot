@@ -1,7 +1,7 @@
 import AppClass from '../core/App'
 import Component from '../core/Component'
 import ReactBootError from '../exception'
-import type { ApplicationParams, IocMap } from '../types'
+import type { ApplicationParams, IocMap, Module, ReactBootConfig } from '../types'
 import type { App } from '../interface'
 
 /**
@@ -18,6 +18,11 @@ export const key = Symbol('ReactBoot')
  * 导出根对象
  */
 export const root: any = window || globalThis || global || self || {}
+
+/**
+ * 反射元数据修饰组件的key
+ */
+export const REFLECT_COMPONENT_KEY = 'REFLECT_COMPONENT_KEY'
 
 /**
  * 打印日志
@@ -56,6 +61,48 @@ export const registerApp = (params: ApplicationParams) => {
     // 打印日志
     log(`[${name.toString()}] Application register success`)
     return app
+}
+
+/**
+ * 加载并注入模块
+ * @param config
+ */
+export const loadModules = (config: ReactBootConfig) => {
+    const { modules } = config
+    if (!modules) {
+        return log('Config modules is required', 'warn')
+    }
+    if (!modules.then) {
+        return log('Config modules must be Promise (you should use import())', 'error')
+    }
+    modules
+        .then(async (mods) => {
+            const modsMap = mods.default || mods
+            Object.keys(modsMap).forEach((path) => {
+                const mod = modsMap[path]
+                const modType = Object.prototype.toString.call(mod)
+                if (modType === '[object Module]') {
+                    // 同步引入模块
+                    const component = (mod as Module).default
+                    const metaData = Reflect.getMetadata(REFLECT_COMPONENT_KEY, component)
+                    console.log('metaData', metaData);
+                }
+                if (modType === '[object Function]') {
+                    console.log('async mod', mod)
+                    // 异步引入的模块
+                    // mod().then((mod) => {
+                    //     const component = mod.default
+                    //     const metaData = Reflect.getMetadata(REFLECT_COMPONENT_KEY, component)
+                    //     console.log('metaData2', metaData)
+                    // })
+                }
+            })
+            // 触发加载完成事件
+            config.onLoad?.()
+        })
+        .catch((e) => {
+            log(`Modules load Fail: ${e}`, 'error')
+        })
 }
 
 /**

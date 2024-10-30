@@ -17,6 +17,16 @@ export type ReactBootConstructor = Constructor<ReactBootApplication>
 export type ComponentConstructor = Constructor<ComponentClass>
 
 /**
+ * key 类型
+ */
+export type Key = string | number | symbol
+
+/**
+ * 应用IOC容器类型
+ */
+export type IocMap = Map<Key, App>
+
+/**
  * 应用启动类装饰器参数
  */
 export type ApplicationParams = {
@@ -28,11 +38,27 @@ export type ApplicationParams = {
 }
 
 /**
- * key 类型
+ * 模块类型
  */
-export type Key = string | number | symbol
+export type Module = { readonly default: any }
 
 /**
- * 应用IOC容器类型
+ * 依赖的模块集合类型
  */
-export type IocMap = Map<Key, App>
+export type Modules = {
+    /** key-模块名称, value-异步模块函数/模块对象 */
+    [key: string]: Module | (() => Promise<Module>)
+}
+
+/**
+ * ReactBoot启动类的配置
+ */
+export type ReactBootConfig = ApplicationParams & {
+    /** 模块集合对象 */
+    modules: Promise<{
+        readonly default: Modules
+    }>
+
+    /** 应用模块加载完成的回调 */
+    onLoad?: () => void
+}

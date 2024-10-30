@@ -55,3 +55,20 @@ export interface App {
     /** 组件集合 */
     components?: Map<Key, Component>
 }
+
+/**
+ * 反射修饰组件元数据
+ */
+export interface ReflectComponentMetaData {
+    /** 组件名称 */
+    name: Key
+
+    /** 组件描述信息 */
+    description?: string
+
+    /** 是否异步组件 */
+    async?: boolean
+
+    /** 组件类名 */
+    className?: string
+}
