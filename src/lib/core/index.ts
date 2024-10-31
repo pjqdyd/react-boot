@@ -1,7 +1,7 @@
 import AppClass from '../core/App'
 import Component from '../core/Component'
 import ReactBootError from '../exception'
-import type { ApplicationParams, IocMap, Module, ReactBootConfig } from '../types'
+import { ApplicationParams, IocMap, GlobalState, Module, ReactBootConfig } from '../types'
 import type { App } from '../interface'
 
 /**
@@ -44,23 +44,40 @@ export const ioc = (() => {
 })() as IocMap
 
 /**
+ * 全局状态机制
+ */
+const globalState: GlobalState = {
+    /** 加载状态 */
+    loadState: 'init',
+}
+export const updateLoadState = (state: GlobalState['loadState']) => {
+    globalState.loadState = state
+}
+
+/**
  * 注册应用到IOC容器
  * @param params
  */
 export const registerApp = (params: ApplicationParams) => {
-    const { name } = params
-    if (!name) {
-        throw new ReactBootError('App name is required')
+    updateLoadState('registerApp')
+    try {
+        const { name } = params
+        if (!name) {
+            throw new ReactBootError('App name is required')
+        }
+        if (ioc.has(name)) {
+            throw new ReactBootError(`App name is must be unique`)
+        }
+        const app = new AppClass(params)
+        // 注册创建的应用
+        ioc.set(name, app)
+        // 打印日志
+        log(`[${name.toString()}] Application register success`)
+        return app
+    } catch (e) {
+        updateLoadState('done')
+        log(`App register Fail: ${e}`, 'error')
     }
-    if (ioc.has(name)) {
-        throw new ReactBootError(`App name is must be unique`)
-    }
-    const app = new AppClass(params)
-    // 注册创建的应用
-    ioc.set(name, app)
-    // 打印日志
-    log(`[${name.toString()}] Application register success`)
-    return app
 }
 
 /**
@@ -68,41 +85,55 @@ export const registerApp = (params: ApplicationParams) => {
  * @param config
  */
 export const loadModules = (config: ReactBootConfig) => {
-    const { modules } = config
-    if (!modules) {
-        return log('Config modules is required', 'warn')
-    }
-    if (!modules.then) {
-        return log('Config modules must be Promise (you should use import())', 'error')
-    }
-    modules
-        .then(async (mods) => {
-            const modsMap = mods.default || mods
-            Object.keys(modsMap).forEach((path) => {
-                const mod = modsMap[path]
-                const modType = Object.prototype.toString.call(mod)
-                if (modType === '[object Module]') {
-                    // 同步引入模块
-                    const component = (mod as Module).default
-                    const metaData = Reflect.getMetadata(REFLECT_COMPONENT_KEY, component)
-                    console.log('metaData', metaData);
-                }
-                if (modType === '[object Function]') {
-                    console.log('async mod', mod)
-                    // 异步引入的模块
-                    // mod().then((mod) => {
-                    //     const component = mod.default
-                    //     const metaData = Reflect.getMetadata(REFLECT_COMPONENT_KEY, component)
-                    //     console.log('metaData2', metaData)
-                    // })
-                }
+    updateLoadState('registerModules')
+    try {
+        const { modules } = config
+        if (!modules) {
+            throw new ReactBootError('Config modules is required')
+        }
+        if (!modules.then) {
+            throw new ReactBootError('Config modules must be Promise (you should use import())')
+        }
+        modules
+            .then(async (mods) => {
+                const modsMap = mods.default || mods
+                Object.keys(modsMap).forEach((path) => {
+                    const mod = modsMap[path]
+                    const modType = Object.prototype.toString.call(mod)
+                    if (modType === '[object Module]') {
+                        // 同步引入模块
+                        const component = (mod as Module).default
+                        const metaData = Reflect.getMetadata(REFLECT_COMPONENT_KEY, component)
+                        console.log('metaData', metaData)
+                        registerComponent(config as ApplicationParams, {
+                            name: metaData.name,
+                            component: component,
+                        })
+                        log(`[${metaData.name}] Component register success`)
+                    }
+                    if (modType === '[object Function]') {
+                        console.log('async mod', mod)
+                        // 异步引入的模块
+                        // mod().then((mod) => {
+                        //     const component = mod.default
+                        //     const metaData = Reflect.getMetadata(REFLECT_COMPONENT_KEY, component)
+                        //     console.log('metaData2', metaData)
+                        // })
+                    }
+                })
+                // 触发加载完成事件
+                config.onLoad?.()
             })
-            // 触发加载完成事件
-            config.onLoad?.()
-        })
-        .catch((e) => {
-            log(`Modules load Fail: ${e}`, 'error')
-        })
+            .catch((e) => {
+                log(`Modules load Fail: ${e}`, 'error')
+            })
+            .finally(() => {
+                updateLoadState('done')
+            })
+    } catch (e) {
+        updateLoadState('done')
+        log(`Modules load Fail: ${e}`, 'error')
+    }
 }
 
 /**
@@ -194,7 +225,7 @@ export const registerComponent = (appParams: Partial<App>, params: any) => {
  * 获取IOC中的组件
  * @param params
  */
-export const getComponent = (appParams: Partial<App>, params: any) => {
+export function getComponent(appParams: Partial<App>, params: any) {
     const { name: appName } = appParams
     const { name: compName } = params
     const app = getApp(appParams)
@@ -206,4 +237,23 @@ export const getComponent = (appParams: Partial<App>, params: any) => {
         throw new ReactBootError(`[${appName?.toString()}]-[${compName}] Component is not found`)
     }
     return component
+}
+
+async function sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+/**
+ * 同步获取组件
+ * @param appParams
+ * @param params
+ */
+export const syncGetComponent = (appParams: Partial<App>, params: any) => {
+    // 使用示例 TODO
+    (async () => {
+        await sleep(2000)
+        console.log('2秒后执行')
+    })()
+    console.log('获取组件')
+    return getComponent(appParams, params)
 }

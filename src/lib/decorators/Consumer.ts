@@ -1,14 +1,26 @@
 import { App } from '../interface'
+import { syncGetComponent } from '../core'
 
 /**
- * Provider 组件消费装饰器
+ * Consumer 组件消费属性装饰器
  * @param appParams
  * @param params
  */
 const Consumer = (appParams: App, params: any) => {
     const { name } = params
-    return (target?: any, className?: string, descriptor?: PropertyDescriptor) => {
-        console.log('xxxxx', target, className, descriptor)
+    return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
+        const component = syncGetComponent(appParams, params)
+        let value = component.component || descriptor.value
+        Object.defineProperty(target, propertyKey, {
+            get() {
+                return value
+            },
+            set(newValue) {
+                value = newValue
+            },
+            enumerable: true,
+            configurable: true,
+        })
     }
 }
 
