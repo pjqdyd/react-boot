@@ -8,7 +8,7 @@ class AppClass implements App {
     readonly name: Key
     readonly description?: string
     reactBoot?: ReactBootApplication
-    components: Map<Key, Component>
+    readonly components: Map<Key, Map<Key, Component>>
 
     constructor(params: App) {
         this.description = params.description

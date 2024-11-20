@@ -1,20 +1,20 @@
-import type { ComponentType } from 'react'
 import type { Component } from '../interface'
-import type { Key } from '../types'
+import type { Key, ProviderConstructor } from '../types'
 
 /**
  * 组件类
  */
 class ComponentClass implements Component {
     readonly name: Key
+    readonly version?: Key
     readonly description?: string
-    component: ComponentType | undefined
-    versions: Map<Key, Component>
+    readonly component: ProviderConstructor | undefined
+
     constructor(params: Component) {
-        this.description = params.description
         this.name = params.name
+        this.version = params.version
+        this.description = params.description
         this.component = params.component
-        this.versions = params.versions || new Map()
     }
 }
 

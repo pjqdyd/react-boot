@@ -25,8 +25,6 @@ const createApp = (params: ApplicationParams) => {
             }
             // 绑定启动类
             bindReactBoot({ name, reactBoot, className: run.name || 'Function' })
-            // 运行启动方法
-            run()
             // 返回实例
             return reactBoot
         } catch (e) {

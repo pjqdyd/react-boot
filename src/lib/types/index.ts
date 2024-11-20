@@ -1,5 +1,4 @@
-import type { ComponentClass } from 'react'
-import type { ReactBootApplication, App } from '../interface'
+import { App, ReactBootApplication, ReflectComponentMetaData } from '../interface'
 
 /**
  * 类装饰器修饰的类型
@@ -12,9 +11,9 @@ export type Constructor<T = any> = new (...args: any[]) => T
 export type ReactBootConstructor = Constructor<ReactBootApplication>
 
 /**
- * 装饰器修饰的组件类型
+ * 提供者装饰器修饰的类型
  */
-export type ComponentConstructor = Constructor<ComponentClass>
+export type ProviderConstructor = Constructor
 
 /**
  * 属性装饰器修饰的值属性
@@ -24,7 +23,7 @@ export type Descriptor = PropertyDescriptor & { initializer?: () => never }
 /**
  * key 类型
  */
-export type Key = string | number | symbol
+export type Key = string | symbol
 
 /**
  * 应用IOC容器类型
@@ -36,11 +35,21 @@ export type IocMap = Map<Key, App>
  */
 export type ApplicationParams = {
     /** 应用名称 */
-    name: string | symbol
+    name: Key
 
     /** 应用描述 */
     description: string
 }
+
+/**
+ * 提供者装饰器参数
+ */
+export type ProviderParams = ReflectComponentMetaData
+
+/**
+ * 消费者装饰器参数
+ */
+export type ConsumerParams = ReflectComponentMetaData
 
 /**
  * 模块类型

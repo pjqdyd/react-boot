@@ -5,7 +5,7 @@ import Provider from './decorators/Provider'
 import Consumer from './decorators/Consumer'
 import createApp from './hooks/createApp'
 import type { ReactBootApplication } from './interface'
-import type { ReactBootConfig } from './types'
+import { ReactBootConfig, ProviderParams, ConsumerParams } from './types'
 
 /**
  * ReactBoot 启动器
@@ -29,8 +29,8 @@ const ReactBoot = (config: ReactBootConfig) => {
     return {
         createApp: createApp(config),
         Application: Application(config),
-        Provider: (params: any) => Provider(config, params),
-        Consumer: (params: any) => Consumer(config, params),
+        Provider: (params: ProviderParams) => Provider(config, params),
+        Consumer: (params: ConsumerParams) => Consumer(config, params),
     }
 }
 

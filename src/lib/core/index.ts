@@ -1,11 +1,11 @@
 import AppClass from '../core/App'
 import Component from '../core/Component'
 import ReactBootError from '../exception'
-import { ApplicationParams, IocMap, Module, ReactBootConfig } from '../types'
-import type { App } from '../interface'
+import { ApplicationParams, ConsumerParams, IocMap, Module, ReactBootConfig } from '../types'
+import type { App, ReflectComponentMetaData } from '../interface'
 
 /**
- * 版本号
+ * ReactBoot版本号
  */
 export const version = '1.0.4'
 
@@ -23,6 +23,11 @@ export const root: any = window || globalThis || global || self || {}
  * 反射元数据修饰组件的key
  */
 export const REFLECT_COMPONENT_KEY = 'REFLECT_COMPONENT_KEY'
+
+/**
+ * 默认组件版本号
+ */
+export const DEFAULT_COMPONENT_VERSION = Symbol('default')
 
 /**
  * 打印日志
@@ -45,7 +50,7 @@ export const ioc = (() => {
 
 /**
  * 注册应用到IOC容器
- * @param params
+ * @param appParams
  */
 export const registerApp = (params: ApplicationParams) => {
     try {
@@ -60,7 +65,7 @@ export const registerApp = (params: ApplicationParams) => {
         // 注册创建的应用
         ioc.set(name, app)
         // 打印日志
-        log(`[${name.toString()}] Application register success`)
+        log(`[${String(name)}] Application register success`)
         return app
     } catch (e) {
         log(`App register Fail: ${e}`, 'error')
@@ -89,16 +94,18 @@ export const loadModules = (config: ReactBootConfig) => {
                     if (modType === '[object Module]') {
                         // 同步引入模块
                         const component = (mod as Module).default
-                        const metaData = Reflect.getMetadata(REFLECT_COMPONENT_KEY, component)
-                        console.log('metaData', metaData)
-                        registerComponent(config as ApplicationParams, {
-                            name: metaData.name,
-                            component: component,
-                        })
-                        log(`[${metaData.name}] Component register success`)
+                        const metaData: ReflectComponentMetaData = Reflect.getMetadata(REFLECT_COMPONENT_KEY, component)
+                        // 注册Provider修饰的组件
+                        if (metaData) {
+                            registerComponent(config as ApplicationParams, {
+                                name: metaData.name,
+                                version: metaData.version,
+                                description: metaData.description,
+                                component: component,
+                            })
+                        }
                     }
                     if (modType === '[object Function]') {
-                        console.log('async mod', mod)
                         // 异步引入的模块
                         // mod().then((mod) => {
                         //     const component = mod.default
@@ -107,10 +114,12 @@ export const loadModules = (config: ReactBootConfig) => {
                         // })
                     }
                 })
-                // 运行应用启动类
-                runReactBoot(config as App)
+
                 // 触发加载完成事件
                 config.onLoad?.()
+
+                // 运行应用启动类
+                runReactBoot(config as App)
             })
             .catch((e) => {
                 log(`Modules load Fail: ${e}`, 'error')
@@ -126,9 +135,10 @@ export const loadModules = (config: ReactBootConfig) => {
  */
 export const bindReactBoot = (params: App) => {
     const { reactBoot, name, className } = params
+    const title = name?.toString()
     const app = getApp(params)
     if (!app) {
-        throw new ReactBootError(`[${name.toString()}] bind App is not found`)
+        throw new ReactBootError(`[${title}] bind App is not found`)
     }
     if (!reactBoot) {
         throw new ReactBootError('bindApp reactBoot is required')
@@ -141,8 +151,9 @@ export const bindReactBoot = (params: App) => {
     reactBoot.destroy = () => {
         destroy?.()
         removeApp(params)
-        log(`[${name.toString()}] Application destroy success`)
+        log(`[${title}] Application destroy success`)
     }
+    log(`[${title}] App ReactBoot bind success`)
 }
 
 /**
@@ -155,11 +166,12 @@ export const runReactBoot = (params: App) => {
     // 获取启动类实例
     const reactBoot = app?.reactBoot
     if (!app || !reactBoot) {
-        throw new ReactBootError(`[${name.toString()}] reactBoot is not found`)
+        throw new ReactBootError(`[${String(name)}] reactBoot is not found`)
     }
     // 运行启动方法
     reactBoot.run?.()
-    log(`[${name.toString()}] App run success`)
+
+    log(`[${String(name)}] App ReactBoot run success`)
 }
 
 /**
@@ -172,7 +184,7 @@ export const getApp = (params: Partial<App>) => {
         throw new ReactBootError('App name is required')
     }
     if (!ioc.has(name)) {
-        log(`[${name.toString()}] App is not found`, 'warn')
+        log(`[${String(name)}] App is not found`, 'warn')
         return null
     }
     return ioc.get(name)
@@ -193,54 +205,77 @@ export const removeApp = (params: Partial<App>) => {
 /**
  * 注册组件到IOC容器
  * @param appParams
- * @param params
+ * @param componentParams
  */
-export const registerComponent = (appParams: Partial<App>, params: any) => {
+export const registerComponent = (appParams: Partial<App>, componentParams: Component) => {
     const { name: appName } = appParams
-    const { name: compName } = params
+    const { name: compName, version = DEFAULT_COMPONENT_VERSION, component, description } = componentParams
+    const title = `[${String(appName)}]-[${String(compName)} ${String(version)}]`
     if (!appName) {
         throw new ReactBootError('App name is required')
     }
     // 获取应用
     const app = ioc.get(appName)
     if (!app) {
-        throw new ReactBootError(`[${appName.toString()}] App is not found`)
+        throw new ReactBootError(`[${String(appName)}] App is not found`)
     }
-    // 如果组件已经存在
-    if (app?.components?.has(compName)) {
-        throw new ReactBootError(`[${compName}] Component name is must be unique`)
+    // 如果组件名称或版本为空
+    if (!compName || !version) {
+        throw new ReactBootError(`${title} Component name、version is required`)
     }
-    // 创建组件
-    const component = new Component({
-        name: compName,
-        component: params.component,
-        versions: new Map(),
-    })
-    // 注册组件
-    app?.components?.set(compName, component)
+    const comp = app.components?.get(compName)
+    // 如果该版本组件已经存在
+    if (comp?.has(version)) {
+        throw new ReactBootError(`${title} Component already exists`)
+    }
 
-    return component
+    // 创建组件
+    const componentInstance: Component = new Component({
+        name: compName,
+        version: version,
+        component: component,
+        description: description,
+    })
+
+    // 存储组件实例
+    if (!comp) {
+        app.components?.set(compName, new Map([[version, componentInstance]]))
+    } else {
+        comp.set(version, componentInstance)
+    }
+
+    log(`${title} Component register success`)
+
+    return componentInstance
 }
 
 /**
- * 获取IOC中的组件
+ * 获取IOC中的组件实例
  * @param appParams
- * @param params
+ * @param consumerParams
  */
-export function getComponent(appParams: Partial<App>, params: any) {
+export function getComponent(appParams: Partial<App>, consumerParams: ConsumerParams) {
     const { name: appName } = appParams
-    const { name: compName } = params
+    const { name: compName, version = DEFAULT_COMPONENT_VERSION } = consumerParams
+    const title = `[${String(appName)}]-[${String(compName)} ${String(version)}]`
     try {
         const app = getApp(appParams)
         if (!app) {
-            throw new ReactBootError(`[${appName?.toString()}] App is not found`)
+            throw new ReactBootError(`[${String(appName)}] App is not found`)
         }
-        const component = app?.components?.get(compName)
+        // 如果组件名称或版本为空
+        if (!compName || !version) {
+            throw new ReactBootError(`${title} Consumer Component name、version is required`)
+        }
+        // 获取组件
+        const component = app.components?.get(compName)?.get(version)
         if (!component) {
-            throw new ReactBootError(`[${appName?.toString()}]-[${compName}] Component is not found`)
+            throw new ReactBootError(`${title} Component is not found`)
         }
+        log(`${title} Component get success`)
+
         return component
     } catch (e) {
-        log(`[${appName?.toString()}]-[${compName}] Component get fail: ${e}`, 'error')
+        log(`${title} Component get fail: ${e}`, 'error')
     }
 }
