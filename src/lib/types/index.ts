@@ -17,22 +17,14 @@ export type ReactBootConstructor = Constructor<ReactBootApplication>
 export type ComponentConstructor = Constructor<ComponentClass>
 
 /**
+ * 属性装饰器修饰的值属性
+ */
+export type Descriptor = PropertyDescriptor & { initializer?: () => never }
+
+/**
  * key 类型
  */
 export type Key = string | number | symbol
-
-/**
- * 全局状态类型
- */
-export type GlobalState = {
-    /** 加载状态
-     * init 初始化状态
-     * registerApp 注册应用状态
-     * registerModules 注册模块状态
-     * done 完成状态
-     * */
-    loadState: 'init' | 'registerApp' | 'registerModules' | 'done'
-}
 
 /**
  * 应用IOC容器类型

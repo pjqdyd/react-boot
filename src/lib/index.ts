@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { registerApp, loadModules, updateLoadState } from './core'
+import { registerApp, loadModules } from './core'
 import Application from './decorators/Application'
 import Provider from './decorators/Provider'
 import Consumer from './decorators/Consumer'

@@ -23,7 +23,7 @@ const Application = (params: ApplicationParams) => {
             // 绑定应用启动类
             bindReactBoot({ name, reactBoot, className: target.name })
             // 运行启动方法
-            reactBoot.run()
+            // reactBoot.run()
             // 返回启动类实例
             return reactBoot
         } catch (e) {

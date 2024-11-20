@@ -1,5 +1,6 @@
 import { App } from '../interface'
-import { syncGetComponent } from '../core'
+import { getComponent } from '../core'
+import type { Descriptor } from '../types'
 
 /**
  * Consumer 组件消费属性装饰器
@@ -7,20 +8,24 @@ import { syncGetComponent } from '../core'
  * @param params
  */
 const Consumer = (appParams: App, params: any) => {
-    const { name } = params
-    return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
-        const component = syncGetComponent(appParams, params)
-        let value = component.component || descriptor.value
-        Object.defineProperty(target, propertyKey, {
+    return (target: any, propertyKey: string, descriptor: Descriptor) => {
+        let value = descriptor.value ?? descriptor.initializer?.()
+        const newDescriptor = {
             get() {
+                const component = getComponent(appParams, params)
+                if (component?.component) {
+                    value = component.component
+                }
                 return value
             },
-            set(newValue) {
+            set(newValue: any) {
                 value = newValue
             },
             enumerable: true,
             configurable: true,
-        })
+        }
+        Object.defineProperty(target, propertyKey, newDescriptor)
+        return newDescriptor
     }
 }
 

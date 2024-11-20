@@ -1,7 +1,7 @@
 import AppClass from '../core/App'
 import Component from '../core/Component'
 import ReactBootError from '../exception'
-import { ApplicationParams, IocMap, GlobalState, Module, ReactBootConfig } from '../types'
+import { ApplicationParams, IocMap, Module, ReactBootConfig } from '../types'
 import type { App } from '../interface'
 
 /**
@@ -44,22 +44,10 @@ export const ioc = (() => {
 })() as IocMap
 
 /**
- * 全局状态机制
- */
-const globalState: GlobalState = {
-    /** 加载状态 */
-    loadState: 'init',
-}
-export const updateLoadState = (state: GlobalState['loadState']) => {
-    globalState.loadState = state
-}
-
-/**
  * 注册应用到IOC容器
  * @param params
  */
 export const registerApp = (params: ApplicationParams) => {
-    updateLoadState('registerApp')
     try {
         const { name } = params
         if (!name) {
@@ -75,7 +63,6 @@ export const registerApp = (params: ApplicationParams) => {
         log(`[${name.toString()}] Application register success`)
         return app
     } catch (e) {
-        updateLoadState('done')
         log(`App register Fail: ${e}`, 'error')
     }
 }
@@ -85,7 +72,6 @@ export const registerApp = (params: ApplicationParams) => {
  * @param config
  */
 export const loadModules = (config: ReactBootConfig) => {
-    updateLoadState('registerModules')
     try {
         const { modules } = config
         if (!modules) {
@@ -121,17 +107,15 @@ export const loadModules = (config: ReactBootConfig) => {
                         // })
                     }
                 })
+                // 运行应用启动类
+                runReactBoot(config as App)
                 // 触发加载完成事件
                 config.onLoad?.()
             })
             .catch((e) => {
                 log(`Modules load Fail: ${e}`, 'error')
             })
-            .finally(() => {
-                updateLoadState('done')
-            })
     } catch (e) {
-        updateLoadState('done')
         log(`Modules load Fail: ${e}`, 'error')
     }
 }
@@ -141,10 +125,10 @@ export const loadModules = (config: ReactBootConfig) => {
  * @param params
  */
 export const bindReactBoot = (params: App) => {
-    const { reactBoot, className } = params
+    const { reactBoot, name, className } = params
     const app = getApp(params)
     if (!app) {
-        throw new ReactBootError(`[${params.name.toString()}] bind App is not found`)
+        throw new ReactBootError(`[${name.toString()}] bind App is not found`)
     }
     if (!reactBoot) {
         throw new ReactBootError('bindApp reactBoot is required')
@@ -157,8 +141,25 @@ export const bindReactBoot = (params: App) => {
     reactBoot.destroy = () => {
         destroy?.()
         removeApp(params)
-        log(`[${params.name.toString()}] Application destroy success`)
+        log(`[${name.toString()}] Application destroy success`)
     }
+}
+
+/**
+ * 运行应用启动类run方法
+ * @param params
+ */
+export const runReactBoot = (params: App) => {
+    const { name } = params
+    const app = getApp(params)
+    // 获取启动类实例
+    const reactBoot = app?.reactBoot
+    if (!app || !reactBoot) {
+        throw new ReactBootError(`[${name.toString()}] reactBoot is not found`)
+    }
+    // 运行启动方法
+    reactBoot.run?.()
+    log(`[${name.toString()}] App run success`)
 }
 
 /**
@@ -223,37 +224,23 @@ export const registerComponent = (appParams: Partial<App>, params: any) => {
 
 /**
  * 获取IOC中的组件
+ * @param appParams
  * @param params
  */
 export function getComponent(appParams: Partial<App>, params: any) {
     const { name: appName } = appParams
     const { name: compName } = params
-    const app = getApp(appParams)
-    if (!app) {
-        throw new ReactBootError(`[${appName?.toString()}] App is not found`)
+    try {
+        const app = getApp(appParams)
+        if (!app) {
+            throw new ReactBootError(`[${appName?.toString()}] App is not found`)
+        }
+        const component = app?.components?.get(compName)
+        if (!component) {
+            throw new ReactBootError(`[${appName?.toString()}]-[${compName}] Component is not found`)
+        }
+        return component
+    } catch (e) {
+        log(`[${appName?.toString()}]-[${compName}] Component get fail: ${e}`, 'error')
     }
-    const component = app?.components?.get(compName)
-    if (!component) {
-        throw new ReactBootError(`[${appName?.toString()}]-[${compName}] Component is not found`)
-    }
-    return component
-}
-
-async function sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-/**
- * 同步获取组件
- * @param appParams
- * @param params
- */
-export const syncGetComponent = (appParams: Partial<App>, params: any) => {
-    // 使用示例 TODO
-    (async () => {
-        await sleep(2000)
-        console.log('2秒后执行')
-    })()
-    console.log('获取组件')
-    return getComponent(appParams, params)
 }
