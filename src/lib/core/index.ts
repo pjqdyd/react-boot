@@ -35,7 +35,7 @@ export const DEFAULT_COMPONENT_VERSION = Symbol('default')
  * @param type
  */
 export const log = (msg: string, type: 'log' | 'warn' | 'error' = 'log') => {
-    const style = `color: #ffffff; font-weight: bold; background: #8A8FF7;`
+    const style = `color: #ffffff; font-weight: bold; background: #4E926F;`
     console[type]?.(`%c ReactBoot ${version}: `, style, msg)
 }
 
