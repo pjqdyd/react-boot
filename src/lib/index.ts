@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { registerApp, loadModules } from './core'
+import { registerApp, loadModules, startReactBoot } from './core'
 import Application from './decorators/Application'
 import Provider from './decorators/Provider'
 import Consumer from './decorators/Consumer'
@@ -21,7 +21,13 @@ const ReactBoot = (config: ReactBootConfig) => {
     /**
      * 加载并注入模块
      */
-    loadModules(config)
+    loadModules(config).then(() => {
+        /** 模块加载完成的回调 */
+        config.onLoad?.()
+
+        /** 启动应用 */
+        startReactBoot(config)
+    })
 
     /**
      * 暴露应用及组件方法
