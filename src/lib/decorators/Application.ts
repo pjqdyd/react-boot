@@ -1,5 +1,5 @@
 import { bindReactBoot, removeApp, log } from '../core'
-import { ApplicationParams, ReactBootConstructor } from '../types'
+import type { ApplicationParams, ReactBootConstructor } from '../types'
 
 /**
  * Application 应用启动类装饰器

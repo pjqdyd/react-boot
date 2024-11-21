@@ -51,7 +51,7 @@ export const ioc = (() => {
 
 /**
  * 注册应用到IOC容器
- * @param appParams
+ * @param params
  */
 export const registerApp = (params: ApplicationParams) => {
     try {
@@ -281,14 +281,14 @@ export function getComponent(appParams: Partial<App>, consumerParams: ConsumerPa
         if (!compName || !version) {
             throw new ReactBootError(`${title} Consumer Component name、version is required`)
         }
-        // 获取组件
-        const component = app.components?.get(compName)?.get(version)
-        if (!component) {
+        // 获取组件实例
+        const componentInstance = app.components?.get(compName)?.get(version)
+        if (!componentInstance) {
             throw new ReactBootError(`${title} Component is not found`)
         }
-        log(`${title} Component get success`)
+        log(`${title} ${componentInstance.isAsync ? 'Async' : ''} Component get success`)
 
-        return component
+        return componentInstance
     } catch (e) {
         log(`${title} Component get fail: ${e}`, 'error')
     }

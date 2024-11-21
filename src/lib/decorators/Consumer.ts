@@ -1,7 +1,7 @@
-import { App } from '../interface'
+import ReactBootError from '../exception'
 import { getComponent } from '../core'
 import type { ConsumerParams, Descriptor } from '../types'
-import ReactBootError from '../exception'
+import type { App, Component } from '../interface'
 
 /**
  * Consumer 组件消费属性装饰器
@@ -18,13 +18,14 @@ const Consumer = (appParams: App, consumerParams: ConsumerParams) => {
             throw new ReactBootError('@Consumer must be used on class properties')
         }
         let value = descriptor.value ?? descriptor.initializer?.call?.(target)
+        let comp: Component | undefined
         const newDescriptor = {
             get() {
                 // 获取组件实例
-                const componentInstance = getComponent(appParams, consumerParams)
-                if (componentInstance?.component) {
-                    value = componentInstance.component
+                if (!comp) {
+                    comp = getComponent(appParams, consumerParams)
                 }
+                value = comp?.component || value
                 return value
             },
             set(newValue: any) {
