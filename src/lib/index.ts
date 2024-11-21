@@ -4,7 +4,7 @@ import Application from './decorators/Application'
 import Provider from './decorators/Provider'
 import Consumer from './decorators/Consumer'
 import createApp from './hooks/createApp'
-import type { ReactBootApplication } from './interface'
+import withAsyncModules from './hooks/withAsyncModules'
 import { ReactBootConfig, ProviderParams, ConsumerParams } from './types'
 
 /**
@@ -42,4 +42,6 @@ const ReactBoot = (config: ReactBootConfig) => {
 
 export * from './types'
 
-export { ReactBoot, ReactBootApplication }
+export * from './interface'
+
+export { ReactBoot, withAsyncModules }

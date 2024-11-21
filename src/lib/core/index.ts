@@ -1,8 +1,8 @@
 import AppClass from '../core/App'
 import Component from '../core/Component'
 import ReactBootError from '../exception'
-import { ApplicationParams, ConsumerParams, IocMap, Module, ReactBootConfig } from '../types'
-import type { App, ReflectComponentMetaData } from '../interface'
+import type { ApplicationParams, ConsumerParams, IocMap, Module, ReactBootConfig } from '../types'
+import type { App, AsyncModule, ReflectComponentMetaData } from '../interface'
 
 /**
  * ReactBoot版本号
@@ -35,7 +35,8 @@ export const DEFAULT_COMPONENT_VERSION = Symbol('default')
  * @param type
  */
 export const log = (msg: string, type: 'log' | 'warn' | 'error' = 'log') => {
-    console[type]?.(`ReactBoot ${version}: `, msg)
+    const style = `color: #ffffff; font-weight: bold; background: #8A8FF7;`
+    console[type]?.(`%c ReactBoot ${version}: `, style, msg)
 }
 
 /**
@@ -91,37 +92,38 @@ export const loadModules = async (config: ReactBootConfig) => {
 
         const modsMap = mods.default || mods
 
-        const syncMods: Array<Module> = []
-        const asyncMods: Array<() => Promise<Module>> = []
-
         Object.keys(modsMap).forEach((path) => {
             const mod = modsMap[path]
             const modType = Object.prototype.toString.call(mod)
+            // 同步引入的模块
             if (modType === '[object Module]') {
-                syncMods.push(mod as Module)
-            }
-            if (modType === '[object Function]') {
-                asyncMods.push(mod as () => Promise<Module>)
-                // 异步引入的模块
-                // mod().then((mod) => {
-                //     const component = mod.default
-                //     const metaData = Reflect.getMetadata(REFLECT_COMPONENT_KEY, component)
-                //     console.log('metaData2', metaData)
-                // })
-            }
-        })
-        // 同步引入模块
-        syncMods.forEach((mod) => {
-            const component = (mod as Module).default
-            const metaData: ReflectComponentMetaData = Reflect.getMetadata(REFLECT_COMPONENT_KEY, component)
-            // 注册Provider修饰的组件
-            if (metaData) {
-                registerComponent(config as ApplicationParams, {
-                    name: metaData.name,
-                    version: metaData.version,
-                    description: metaData.description,
-                    component: component,
-                })
+                const component = (mod as Module).default
+                const metaData: ReflectComponentMetaData = Reflect.getMetadata(REFLECT_COMPONENT_KEY, component)
+                // 注册Provider修饰的组件
+                if (metaData) {
+                    registerComponent(config as ApplicationParams, {
+                        name: metaData.name,
+                        version: metaData.version,
+                        description: metaData.description,
+                        isAsync: false,
+                        component: component,
+                    })
+                }
+            } else if (modType === '[object Object]') {
+                // 通过withAsyncModules引入的异步模块
+                const asyncMod = mod as AsyncModule
+                if (asyncMod.isAsync) {
+                    registerComponent(config as ApplicationParams, {
+                        name: asyncMod.name,
+                        version: asyncMod.version,
+                        description: asyncMod.description,
+                        isAsync: true,
+                        component: asyncMod.module,
+                    })
+                }
+            } else if (modType === '[object Function]') {
+                // 直接异步引入的模块
+                log(`[${path}] Async Module should use "withAsyncModules" defined`, 'warn')
             }
         })
     } catch (e) {
@@ -216,8 +218,8 @@ export const removeApp = (params: Partial<App>) => {
  */
 export const registerComponent = (appParams: Partial<App>, componentParams: Component) => {
     const { name: appName } = appParams
-    const { name: compName, version = DEFAULT_COMPONENT_VERSION, component, description } = componentParams
-    const title = `[${String(appName)}]-[${String(compName)} ${String(version)}]`
+    const { name: compName, version = DEFAULT_COMPONENT_VERSION, isAsync, component, description } = componentParams
+    const title = `[${String(appName)}]-[${String(compName)} ${String(version)}] ${isAsync ? 'Async' : ''}`
     try {
         if (!appName) {
             throw new ReactBootError('App name is required')
@@ -241,6 +243,7 @@ export const registerComponent = (appParams: Partial<App>, componentParams: Comp
         const componentInstance: Component = new Component({
             name: compName,
             version: version,
+            isAsync: isAsync,
             component: component,
             description: description,
         })
