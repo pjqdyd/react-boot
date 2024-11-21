@@ -86,7 +86,7 @@ export const loadModules = async (config: ReactBootConfig) => {
         if (!modules.then) {
             throw new ReactBootError('Config modules must be Promise (you should use import())')
         }
-
+        const start = new Date().getTime()
         // 加载所有模块
         const mods = await modules
 
@@ -126,6 +126,10 @@ export const loadModules = async (config: ReactBootConfig) => {
                 log(`[${path}] Async Module should use "withAsyncModules" defined`, 'warn')
             }
         })
+
+        const end = new Date().getTime()
+
+        log(`[${String(config.name)}] All modules load success, cost ${end - start} ms`)
     } catch (e) {
         log(`Modules load Fail: ${e}`, 'error')
     }
