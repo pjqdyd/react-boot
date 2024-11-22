@@ -1,6 +1,6 @@
 import { REFLECT_COMPONENT_KEY } from '../core'
 import ReactBootError from '../exception'
-import type { ApplicationParams, ProviderConstructor, ProviderParams } from '../types'
+import type { ProviderConstructor, ProviderParams, ReactBootConfig } from '../types'
 import type { ReflectComponentMetaData } from '../interface'
 
 /**
@@ -8,7 +8,7 @@ import type { ReflectComponentMetaData } from '../interface'
  * @param appParams
  * @param providerParams
  */
-const Provider = (appParams: ApplicationParams, providerParams: ProviderParams) => {
+const Provider = (appParams: ReactBootConfig, providerParams: ProviderParams) => {
     const { name, version, description } = providerParams
     return (target?: ProviderConstructor) => {
         if (!name) {

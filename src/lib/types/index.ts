@@ -1,4 +1,4 @@
-import { App, type AsyncModule, AsyncModuleOption, ReactBootApplication, ReflectComponentMetaData } from '../interface'
+import { App, type AsyncModule, ReactBootApplication, ReflectComponentMetaData } from '../interface'
 
 /**
  * 类装饰器修饰的类型
@@ -31,17 +31,6 @@ export type Key = string | symbol
 export type IocMap = Map<Key, App>
 
 /**
- * 应用启动类装饰器参数
- */
-export type ApplicationParams = {
-    /** 应用名称 */
-    name: Key
-
-    /** 应用描述 */
-    description: string
-}
-
-/**
  * 提供者装饰器参数
  */
 export type ProviderParams = ReflectComponentMetaData
@@ -67,12 +56,28 @@ export type Modules = {
 /**
  * ReactBoot启动类的配置
  */
-export type ReactBootConfig = ApplicationParams & {
-    /** 模块集合对象 */
-    modules: Promise<{
-        readonly default: Modules
-    }>
+export type ReactBootConfig = {
+    /** 应用名称 */
+    name: Key
+
+    /** 应用描述 */
+    description: string
 
     /** 应用模块加载完成的回调 */
     onLoad?: () => void
+}
+
+/**
+ * 扫描的模块类型
+ */
+export type ScanModules = Modules | Promise<{ readonly default: Modules }>
+
+/**
+ * 应用启动类装饰器参数
+ */
+export type ApplicationParams = {
+    /**
+     * 扫描的模块
+     */
+    modules?: ScanModules
 }

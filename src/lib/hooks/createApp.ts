@@ -1,12 +1,12 @@
 import { bindReactBoot, log, removeApp } from '../core'
-import type { ApplicationParams } from '../types'
+import type { ReactBootConfig } from '../types'
 import type { ReactBootApplication } from '../interface'
 
 /**
  * 应用启动类hooks
  * @param params
  */
-const createApp = (params: ApplicationParams) => {
+const createApp = (params: ReactBootConfig) => {
     const { name } = { ...params }
 
     return (options: ReactBootApplication): ReactBootApplication | undefined => {

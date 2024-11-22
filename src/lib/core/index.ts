@@ -53,7 +53,7 @@ export const ioc = (() => {
  * 注册应用到IOC容器
  * @param params
  */
-export const registerApp = (params: ApplicationParams) => {
+export const registerApp = (params: ReactBootConfig) => {
     try {
         const { name } = params
         if (!name) {
@@ -74,23 +74,67 @@ export const registerApp = (params: ApplicationParams) => {
 }
 
 /**
- * 加载并注入模块
+ * bindModules 绑定模块加载器
+ * 使用生成器模式，保证在未来某一时刻加载模块
+ * 保证模块在应用注册后，应用启动前加载，避免阻塞，造成循环依赖
  * @param config
  */
-export const loadModules = async (config: ReactBootConfig) => {
-    try {
-        const { modules } = config
-        if (!modules) {
-            throw new ReactBootError('Config modules is required')
-        }
-        if (!modules.then) {
-            throw new ReactBootError('Config modules must be Promise (you should use import())')
-        }
-        const start = new Date().getTime()
-        // 加载所有模块
-        const mods = await modules
+let modulesLoader: Generator<Promise<void>, void, unknown> | null = null
+function* modulesLoaderGenerator(config: ReactBootConfig) {
+    /**
+     * 等待执行加载模块
+     */
+    yield execModulesLoad(config)
+}
+export const bindModules = (config: ReactBootConfig) => {
+    modulesLoader = modulesLoaderGenerator(config)
+    log(`[${String(config.name)}] Modules loader bind success`)
+}
 
-        const modsMap = mods.default || mods
+/**
+ * 加载模块
+ * @param config
+ */
+export const loadModules = (config: ReactBootConfig) => {
+    return new Promise<void>((resolve, reject) => {
+        const { name } = config
+        const start = new Date().getTime()
+        /**
+         * 使用生成器加载模块
+         * 保证模块加载异步执行，避免阻塞，造成循环依赖
+         */
+        Promise.resolve().then(() => {
+            const loader = modulesLoader?.next?.()
+            if (!loader || loader.done) {
+                log(`[${String(name)}] Modules Loader is ${loader?.done}`, 'warn')
+                return resolve()
+            }
+            loader.value
+                ?.then(() => {
+                    const end = new Date().getTime()
+                    log(`[${String(name)}] All modules load success, cost ${end - start} ms`)
+                    resolve()
+                })
+                .catch((e) => reject(e))
+        })
+    })
+}
+
+/**
+ * 执行模块加载
+ * @param config
+ */
+export const execModulesLoad = async (config: ReactBootConfig & ApplicationParams) => {
+    try {
+        const { modules, name } = config
+        if (!modules) {
+            log(`[${String(name)}] Modules is not defined (please use @Application({ modules })`, 'warn')
+            return
+        }
+        // 加载引入的模块
+        const mods = modules.then ? await modules : modules
+        // 支持同步或异步引入的模块
+        const modsMap = (mods as Module)?.default || mods
 
         Object.keys(modsMap).forEach((path) => {
             const mod = modsMap[path]
@@ -101,7 +145,7 @@ export const loadModules = async (config: ReactBootConfig) => {
                 const metaData: ReflectComponentMetaData = Reflect.getMetadata(REFLECT_COMPONENT_KEY, component)
                 // 注册Provider修饰的组件
                 if (metaData) {
-                    registerComponent(config as ApplicationParams, {
+                    registerComponent(config, {
                         name: metaData.name,
                         version: metaData.version,
                         description: metaData.description,
@@ -113,7 +157,7 @@ export const loadModules = async (config: ReactBootConfig) => {
                 // 通过withAsyncModules引入的异步模块
                 const asyncMod = mod as AsyncModule
                 if (asyncMod.isAsync) {
-                    registerComponent(config as ApplicationParams, {
+                    registerComponent(config, {
                         name: asyncMod.name,
                         version: asyncMod.version,
                         description: asyncMod.description,
@@ -126,10 +170,6 @@ export const loadModules = async (config: ReactBootConfig) => {
                 log(`[${path}] Async Module should use "withAsyncModules" defined`, 'warn')
             }
         })
-
-        const end = new Date().getTime()
-
-        log(`[${String(config.name)}] All modules load success, cost ${end - start} ms`)
     } catch (e) {
         log(`Modules load Fail: ${e}`, 'error')
     }

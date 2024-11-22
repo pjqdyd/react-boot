@@ -1,14 +1,14 @@
 import ReactBootError from '../exception'
 import { getComponent } from '../core'
-import type { ConsumerParams, Descriptor } from '../types'
-import type { App, Component } from '../interface'
+import type { ConsumerParams, Descriptor, ReactBootConfig } from '../types'
+import type { Component } from '../interface'
 
 /**
  * Consumer 组件消费属性装饰器
  * @param appParams
  * @param consumerParams
  */
-const Consumer = (appParams: App, consumerParams: ConsumerParams) => {
+const Consumer = (appParams: ReactBootConfig, consumerParams: ConsumerParams) => {
     const { name } = consumerParams
     return (target: any, propertyKey: string, descriptor: Descriptor) => {
         if (!name) {
