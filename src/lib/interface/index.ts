@@ -10,7 +10,8 @@ export interface ReactBootApplication {
     run: () => void
 
     /**
-     * 销毁方法
+     * 销毁方法,暴露给应用自行调用
+     * 执行此方法后, App及其组件会从IOC容器中移除
      */
     destroy?: () => void
 }
@@ -31,7 +32,7 @@ export interface Component {
     /** 是否异步组件 */
     readonly isAsync?: boolean
 
-    /** 组件 */
+    /** 实际组件 */
     readonly component: ProviderConstructor | (() => Promise<Module>) | undefined
 }
 

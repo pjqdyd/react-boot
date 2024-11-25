@@ -41,19 +41,6 @@ export type ProviderParams = ReflectComponentMetaData
 export type ConsumerParams = ReflectComponentMetaData
 
 /**
- * 模块类型
- */
-export type Module = { readonly default: any }
-
-/**
- * 依赖的模块集合类型
- */
-export type Modules = {
-    /** key-模块名称, value-异步模块函数/模块对象 */
-    [key: string]: Module | (() => Promise<Module>) | AsyncModule
-}
-
-/**
  * ReactBoot启动类的配置
  */
 export type ReactBootConfig = {
@@ -65,6 +52,24 @@ export type ReactBootConfig = {
 
     /** 应用模块加载完成的回调 */
     onLoad?: () => void
+}
+
+/**
+ * ReactBoot启动类参数
+ */
+export type ReactBootParams = ReactBootConfig & ApplicationParams
+
+/**
+ * 模块类型
+ */
+export type Module = { readonly default: any }
+
+/**
+ * 依赖的模块集合类型
+ */
+export type Modules = {
+    /** key-模块名称, value-模块对象/异步模块对象 */
+    [key: string]: Module | AsyncModule
 }
 
 /**

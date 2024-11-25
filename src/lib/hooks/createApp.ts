@@ -1,5 +1,5 @@
-import { bindReactBoot, log, removeApp } from '../core'
-import type { ReactBootConfig } from '../types'
+import { bindReactBoot, bindModules, log, removeApp } from '../core'
+import type { ApplicationParams, ReactBootConfig } from '../types'
 import type { ReactBootApplication } from '../interface'
 
 /**
@@ -7,13 +7,13 @@ import type { ReactBootApplication } from '../interface'
  * @param params
  */
 const createApp = (params: ReactBootConfig) => {
-    const { name } = { ...params }
+    const { name } = params
 
-    return (options: ReactBootApplication): ReactBootApplication | undefined => {
+    return (options: ReactBootApplication & ApplicationParams): ReactBootApplication | void => {
         const { run, destroy } = options
-        if (typeof run !== 'function' || typeof destroy !== 'function') {
+        if (typeof run !== 'function') {
             // 未正确使用 createApp
-            log(`[${name.toString()}] createApp should accepted the function argument`, 'error')
+            log(`[${String(name)}] createApp should accepted the function argument`, 'error')
             return
         }
         // 直接使用 createApp(function, function)
@@ -23,13 +23,18 @@ const createApp = (params: ReactBootConfig) => {
                 run: run,
                 destroy: destroy,
             }
+
             // 绑定启动类
             bindReactBoot({ name, reactBoot, className: run.name || 'Function' })
+
+            // 绑定模块加载器
+            bindModules({ ...params, modules: options.modules })
+
             // 返回实例
             return reactBoot
         } catch (e) {
             removeApp({ name })
-            log(`[${name.toString()}] Application run fail: ${e}`, 'error')
+            log(`[${String(name)}] Application run fail: ${e}`, 'error')
         }
     }
 }

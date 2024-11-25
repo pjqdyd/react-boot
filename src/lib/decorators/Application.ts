@@ -1,13 +1,14 @@
 import { bindReactBoot, bindModules, removeApp, log } from '../core'
-import type { ReactBootConfig, ReactBootConstructor, ApplicationParams } from '../types'
+import type { ReactBootApplication } from '../interface'
+import { ReactBootConstructor, ApplicationParams, ReactBootParams } from '../types'
 
 /**
  * Application 应用启动类装饰器
  * @param params
  */
-const Application = (params: ReactBootConfig & ApplicationParams) => {
+const Application = (params: ReactBootParams) => {
     const { name } = params
-    return (target?: ReactBootConstructor | ApplicationParams | undefined) => {
+    return (target?: ReactBootConstructor | ApplicationParams | undefined): ReactBootApplication | any => {
         if (!target) {
             // 使用装饰器 @Application()
             return Application({ ...params })
@@ -18,12 +19,13 @@ const Application = (params: ReactBootConfig & ApplicationParams) => {
         }
         if (typeof target !== 'function') {
             // 未正确使用装饰器
-            return log(`[${String(name)}] @Application({...}) should be used on the class function`, 'error')
+            log(`[${String(name)}] @Application({...}) should be used on the class function`, 'error')
+            return
         }
         // 直接使用装饰器 @Application
         try {
             // 创建启动类
-            const reactBoot = new target()
+            const reactBoot: ReactBootApplication = new target()
 
             // 绑定应用启动类
             bindReactBoot({ name, reactBoot, className: target.name })

@@ -5,7 +5,7 @@ import Provider from './decorators/Provider'
 import Consumer from './decorators/Consumer'
 import createApp from './hooks/createApp'
 import withAsyncModules from './hooks/withAsyncModules'
-import { ReactBootConfig, ProviderParams, ConsumerParams } from './types'
+import type { ReactBootConfig, ProviderParams, ConsumerParams } from './types'
 
 /**
  * ReactBoot 启动器
