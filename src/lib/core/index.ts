@@ -304,22 +304,24 @@ export const execModulesLoad = async (params: ReactBootParams) => {
             const modType = Object.prototype.toString.call(mod)
             // 同步引入的模块
             if (modType === '[object Module]') {
-                const component = (mod as Module).default
-                const metaData: ReflectComponentMetaData = Reflect.getMetadata(REFLECT_COMPONENT_KEY, component)
-                // 注册Provider修饰的组件
-                if (metaData) {
-                    registerComponent(params, {
-                        name: metaData.name,
-                        version: metaData.version,
-                        description: metaData.description,
-                        isAsync: false,
-                        component: component,
-                    })
+                const component = (mod as Module)?.default
+                if (component) {
+                    const metaData: ReflectComponentMetaData = Reflect.getMetadata(REFLECT_COMPONENT_KEY, component)
+                    // 注册Provider修饰的组件
+                    if (metaData) {
+                        registerComponent(params, {
+                            name: metaData.name,
+                            version: metaData.version,
+                            description: metaData.description,
+                            isAsync: false,
+                            component: component,
+                        })
+                    }
                 }
             } else if (modType === '[object Object]') {
                 // 通过withAsyncModules引入的异步模块
                 const asyncMod = mod as AsyncModule
-                if (asyncMod.isAsync) {
+                if (asyncMod?.isAsync) {
                     registerComponent(params, {
                         name: asyncMod.name,
                         version: asyncMod.version,
