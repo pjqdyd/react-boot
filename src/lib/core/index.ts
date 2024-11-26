@@ -270,7 +270,7 @@ export const loadModules = (params: ReactBootParams) => {
         Promise.resolve().then(() => {
             const loader = modulesLoader?.next?.()
             if (!loader || loader.done) {
-                log(`[${String(name)}] Modules Loader is ${loader?.done}`, 'warn')
+                log(`[${String(name)}] Modules Loader is ${loader?.done ? 'done' : 'undefined'}`, 'warn')
                 return resolve()
             }
             loader.value
