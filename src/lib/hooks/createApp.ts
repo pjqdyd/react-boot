@@ -13,7 +13,7 @@ const createApp = (params: ReactBootConfig) => {
         const { run, destroy } = options
         if (typeof run !== 'function') {
             // 未正确使用 createApp
-            log(`[${String(name)}] createApp should accepted the function argument`, 'error')
+            log(`[${String(name)}] createApp options.run is not a function`, 'error')
             return
         }
         // 直接使用 createApp(function, function)
