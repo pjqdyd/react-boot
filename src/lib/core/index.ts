@@ -105,7 +105,7 @@ export const bindReactBoot = (appParams: App) => {
 
 /**
  * 运行应用启动类run方法
- * @param params
+ * @param appParams
  */
 export const startReactBoot = (appParams: App) => {
     const { name } = appParams
