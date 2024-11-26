@@ -5,10 +5,10 @@ import type { Component } from '../interface'
 
 /**
  * Consumer 组件消费属性装饰器
- * @param appParams
+ * @param config
  * @param consumerParams
  */
-const Consumer = (appParams: ReactBootConfig, consumerParams: ConsumerParams) => {
+const Consumer = (config: ReactBootConfig, consumerParams: ConsumerParams) => {
     const { name } = consumerParams
     return (target: any, propertyKey: string, descriptor: Descriptor) => {
         if (!name) {
@@ -23,7 +23,7 @@ const Consumer = (appParams: ReactBootConfig, consumerParams: ConsumerParams) =>
             get() {
                 // 获取组件实例
                 if (!comp) {
-                    comp = getComponent(appParams, consumerParams)
+                    comp = getComponent(config, consumerParams)
                 }
                 value = comp?.component || value
                 return value

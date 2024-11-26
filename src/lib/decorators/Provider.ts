@@ -5,10 +5,10 @@ import type { ReflectComponentMetaData } from '../interface'
 
 /**
  * Provider 组件提供装饰器
- * @param appParams
+ * @param config
  * @param providerParams
  */
-const Provider = (appParams: ReactBootConfig, providerParams: ProviderParams) => {
+const Provider = (config: ReactBootConfig, providerParams: ProviderParams) => {
     const { name, version, description } = providerParams
     return (target?: ProviderConstructor) => {
         if (!name) {
