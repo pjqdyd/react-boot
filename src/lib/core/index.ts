@@ -292,7 +292,8 @@ export const execModulesLoad = async (params: ReactBootParams) => {
     try {
         const { modules, name } = params
         if (!modules) {
-            log(`[${String(name)}] Modules is not defined (please use @Application({ modules })`, 'warn')
+            const info = `Modules is not defined (please use @Application({ modules }) or createApp({ modules, ... })`
+            log(`[${String(name)}] ${info}`, 'warn')
             return
         }
         // 加载引入的模块
