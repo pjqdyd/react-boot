@@ -78,7 +78,7 @@ export const registerApp = (config: ReactBootConfig) => {
  * @param appParams
  */
 export const bindReactBoot = (appParams: App) => {
-    const { reactBoot, name, className } = appParams
+    const { reactBoot, name } = appParams
     try {
         const app = getApp(appParams)
         if (!app) {
@@ -89,7 +89,6 @@ export const bindReactBoot = (appParams: App) => {
         }
         // 绑定启动类
         app.reactBoot = reactBoot
-        app.className = className
         // 绑定销毁事件
         const destroy = reactBoot.destroy?.bind?.(this)
         reactBoot.destroy = () => {
@@ -161,7 +160,7 @@ export const removeApp = (appParams: Partial<App>) => {
 export const registerComponent = (appParams: Partial<App>, componentParams: Component) => {
     const { name: appName } = appParams
     const { name: compName, version = DEFAULT_COMPONENT_VERSION, isAsync, component, description } = componentParams
-    const title = `[${String(appName)}]-[${String(compName)} ${String(version)}] ${isAsync ? 'Async' : ''}`
+    const title = `[${String(appName)}] [${String(compName)} ${String(version)}] ${isAsync ? 'Async' : ''}`
     try {
         if (!appName) {
             throw new ReactBootError('App name is required')
@@ -213,7 +212,7 @@ export const registerComponent = (appParams: Partial<App>, componentParams: Comp
 export function getComponent(appParams: Partial<App>, consumerParams: ConsumerParams) {
     const { name: appName } = appParams
     const { name: compName, version = DEFAULT_COMPONENT_VERSION } = consumerParams
-    const title = `[${String(appName)}]-[${String(compName)} ${String(version)}]`
+    const title = `[${String(appName)}] [${String(compName)} ${String(version)}]`
     try {
         const app = getApp(appParams)
         if (!app) {

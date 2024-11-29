@@ -28,7 +28,7 @@ const Application = (params: ReactBootParams) => {
             const reactBoot: ReactBootApplication = new target()
 
             // 绑定应用启动类
-            bindReactBoot({ name, reactBoot, className: target.name })
+            bindReactBoot({ name, reactBoot })
 
             // 绑定模块加载器
             bindModules(params)

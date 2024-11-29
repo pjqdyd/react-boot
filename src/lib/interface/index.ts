@@ -49,9 +49,6 @@ export interface App {
     /** 启动应用实例 */
     reactBoot?: ReactBootApplication
 
-    /** 启动应用应用类名 */
-    className?: string
-
     /** 组件集合 组件名-版本号 => 组件对象 */
     components?: Map<Key, Map<Key, Component>>
 }

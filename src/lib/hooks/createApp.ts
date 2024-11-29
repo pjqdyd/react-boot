@@ -25,7 +25,7 @@ const createApp = (params: ReactBootConfig) => {
             }
 
             // 绑定启动类
-            bindReactBoot({ name, reactBoot, className: run.name || 'Function' })
+            bindReactBoot({ name, reactBoot })
 
             // 绑定模块加载器
             bindModules({ ...params, modules: options.modules })
