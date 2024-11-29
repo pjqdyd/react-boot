@@ -3,7 +3,7 @@ import type { ConsumerParams, ReactBootConfig } from '../types'
 import type { Component } from '../interface'
 
 /**
- * Consumer 组件消费属性装饰器
+ * Consumer 组件消费hooks
  * @param config
  * @param consumerParams
  */
