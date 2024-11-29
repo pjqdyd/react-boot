@@ -34,9 +34,17 @@ export const DEFAULT_COMPONENT_VERSION = Symbol('default_component_version')
  * @param msg
  * @param type
  */
-export const log = (msg: string, type: 'log' | 'warn' | 'error' = 'log') => {
-    const style = `color: #ffffff; font-weight: bold; background: #4E926F;`
-    console[type]?.(`%c ReactBoot ${version}: `, style, msg)
+const colors = {
+    log: '#62A986',
+    warn: '#D9A557',
+    error: '#EC4949',
+}
+export const log = (message: string, type: 'log' | 'warn' | 'error' = 'log') => {
+    console[type]?.(
+        `%c ReactBoot ${version}: `,
+        `color: #ffffff; font-weight: bold; background: ${colors[type]};`,
+        message,
+    )
 }
 
 /**
@@ -74,6 +82,34 @@ export const registerApp = (config: ReactBootConfig) => {
 }
 
 /**
+ * 获取IOC中的应用
+ * @param appParams
+ */
+export const getApp = (appParams: Partial<App>) => {
+    const { name } = appParams
+    if (!name) {
+        throw new ReactBootError('App name is required')
+    }
+    const app = ioc.get(name)
+    if (!app) {
+        throw new ReactBootError(`[${String(name)}] App is not found`)
+    }
+    return app
+}
+
+/**
+ * 从IOC容器删除应用
+ * @param appParams
+ */
+export const removeApp = (appParams: Partial<App>) => {
+    const { name } = appParams
+    if (!name) {
+        throw new ReactBootError('Remove app name is required')
+    }
+    return ioc.delete(name)
+}
+
+/**
  * 绑定应用启动类
  * @param appParams
  */
@@ -81,9 +117,6 @@ export const bindReactBoot = (appParams: App) => {
     const { reactBoot, name } = appParams
     try {
         const app = getApp(appParams)
-        if (!app) {
-            throw new ReactBootError(`[${String(name)}] bind App is not found`)
-        }
         if (!reactBoot) {
             throw new ReactBootError(`[${String(name)}] bindApp reactBoot is required`)
         }
@@ -111,45 +144,16 @@ export const startReactBoot = (appParams: App) => {
     try {
         const app = getApp(appParams)
         // 获取启动类实例
-        const reactBoot = app?.reactBoot
-        if (!app || !reactBoot) {
+        const reactBoot = app.reactBoot
+        if (!reactBoot) {
             throw new ReactBootError(`[${String(name)}] reactBoot is not found`)
         }
         // 运行启动方法
         reactBoot.run?.()
-
         log(`[${String(name)}] App ReactBoot run success`)
     } catch (e) {
         log(`[${String(name)}] App ReactBoot run Fail: ${e}`, 'error')
     }
-}
-
-/**
- * 获取IOC中的应用
- * @param appParams
- */
-export const getApp = (appParams: Partial<App>) => {
-    const { name } = appParams
-    if (!name) {
-        throw new ReactBootError('App name is required')
-    }
-    if (!ioc.has(name)) {
-        log(`[${String(name)}] App is not found`, 'warn')
-        return null
-    }
-    return ioc.get(name)
-}
-
-/**
- * 从IOC容器删除应用
- * @param appParams
- */
-export const removeApp = (appParams: Partial<App>) => {
-    const { name } = appParams
-    if (!name) {
-        throw new ReactBootError('Remove app name is required')
-    }
-    return ioc.delete(name)
 }
 
 /**
@@ -162,14 +166,7 @@ export const registerComponent = (appParams: Partial<App>, componentParams: Comp
     const { name: compName, version = DEFAULT_COMPONENT_VERSION, isAsync, component, description } = componentParams
     const title = `[${String(appName)}] [${String(compName)} ${String(version)}] ${isAsync ? 'Async' : ''}`
     try {
-        if (!appName) {
-            throw new ReactBootError('App name is required')
-        }
-        // 获取应用
-        const app = ioc.get(appName)
-        if (!app) {
-            throw new ReactBootError(`[${String(appName)}] App is not found`)
-        }
+        const app = getApp(appParams)
         // 如果组件名称或版本为空
         if (!compName || !version) {
             throw new ReactBootError(`${title} Component name、version is required`)
@@ -215,9 +212,6 @@ export function getComponent(appParams: Partial<App>, consumerParams: ConsumerPa
     const title = `[${String(appName)}] [${String(compName)} ${String(version)}]`
     try {
         const app = getApp(appParams)
-        if (!app) {
-            throw new ReactBootError(`[${String(appName)}] App is not found`)
-        }
         // 如果组件名称或版本为空
         if (!compName || !version) {
             throw new ReactBootError(`${title} Consumer Component name、version is required`)
@@ -242,7 +236,6 @@ export function getComponent(appParams: Partial<App>, consumerParams: ConsumerPa
  * 保证模块在应用注册后，应用启动前加载，避免阻塞，造成循环依赖
  * @param params
  */
-let modulesLoader: Generator<Promise<void>, void, unknown> | null = null
 function* modulesLoaderGenerator(params: ReactBootParams) {
     /**
      * 等待执行加载模块
@@ -250,8 +243,16 @@ function* modulesLoaderGenerator(params: ReactBootParams) {
     yield execModulesLoad(params)
 }
 export const bindModules = (params: ReactBootParams) => {
-    modulesLoader = modulesLoaderGenerator(params)
-    log(`[${String(params.name)}] Modules loader bind success`)
+    const { name } = params
+    try {
+        const app = getApp(params)
+        // 绑定模块加载器
+        app.modulesLoader = modulesLoaderGenerator(params)
+
+        log(`[${String(name)}] Modules loader bind success`)
+    } catch (e) {
+        log(`[${String(name)}] Modules loader bind fail`, 'error')
+    }
 }
 
 /**
@@ -267,7 +268,8 @@ export const loadModules = (params: ReactBootParams) => {
          * 保证模块加载异步执行，避免阻塞，造成循环依赖
          */
         Promise.resolve().then(() => {
-            const loader = modulesLoader?.next?.()
+            const app = getApp(params)
+            const loader = app.modulesLoader?.next?.()
             if (!loader || loader.done) {
                 log(`[${String(name)}] Modules Loader is ${loader?.done ? 'done' : 'undefined'}`, 'warn')
                 return resolve()
@@ -299,42 +301,44 @@ export const execModulesLoad = async (params: ReactBootParams) => {
         const mods = modules.then ? await modules : modules
         // 支持同步或异步引入的模块
         const modsMap = (mods as Module)?.default || mods
-        Object.keys(modsMap).forEach((path) => {
-            const mod = modsMap[path]
-            const modType = Object.prototype.toString.call(mod)
-            // 同步引入的模块
-            if (modType === '[object Module]') {
-                const component = (mod as Module)?.default
-                if (component) {
-                    const metaData: ReflectComponentMetaData = Reflect.getMetadata(REFLECT_COMPONENT_KEY, component)
-                    // 注册Provider修饰的组件
-                    if (metaData) {
+        Object.keys(modsMap)
+            .filter((path) => Boolean(modsMap[path]))
+            .forEach((path) => {
+                const mod = modsMap[path]
+                const modType = Object.prototype.toString.call(mod)
+                // 同步引入的模块
+                if (modType === '[object Module]') {
+                    const component = (mod as Module).default
+                    if (component) {
+                        const metaData: ReflectComponentMetaData = Reflect.getMetadata(REFLECT_COMPONENT_KEY, component)
+                        // 注册Provider修饰的组件
+                        if (metaData) {
+                            registerComponent(params, {
+                                name: metaData.name,
+                                version: metaData.version,
+                                description: metaData.description,
+                                isAsync: false,
+                                component: component,
+                            })
+                        }
+                    }
+                } else if (modType === '[object Object]') {
+                    // 通过withAsyncModules引入的异步模块
+                    const asyncMod = mod as AsyncModule
+                    if (asyncMod.isAsync) {
                         registerComponent(params, {
-                            name: metaData.name,
-                            version: metaData.version,
-                            description: metaData.description,
-                            isAsync: false,
-                            component: component,
+                            name: asyncMod.name,
+                            version: asyncMod.version,
+                            description: asyncMod.description,
+                            isAsync: true,
+                            component: asyncMod.module,
                         })
                     }
+                } else if (modType === '[object Function]') {
+                    // 直接异步引入的模块
+                    log(`[${path}] Async Module should use "withAsyncModules" defined`, 'warn')
                 }
-            } else if (modType === '[object Object]') {
-                // 通过withAsyncModules引入的异步模块
-                const asyncMod = mod as AsyncModule
-                if (asyncMod?.isAsync) {
-                    registerComponent(params, {
-                        name: asyncMod.name,
-                        version: asyncMod.version,
-                        description: asyncMod.description,
-                        isAsync: true,
-                        component: asyncMod.module,
-                    })
-                }
-            } else if (modType === '[object Function]') {
-                // 直接异步引入的模块
-                log(`[${path}] Async Module should use "withAsyncModules" defined`, 'warn')
-            }
-        })
+            })
     } catch (e) {
         log(`Modules load Fail: ${e}`, 'error')
     }

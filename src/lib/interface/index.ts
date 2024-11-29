@@ -17,6 +17,26 @@ export interface ReactBootApplication {
 }
 
 /**
+ * App类的接口
+ */
+export interface App {
+    /** 应用名称 */
+    readonly name: Key
+
+    /** 应用描述信息 */
+    readonly description?: string
+
+    /** 启动应用实例 */
+    reactBoot?: ReactBootApplication
+
+    /** 应用模块加载器 */
+    modulesLoader?: Generator<Promise<void>, void>
+
+    /** 组件集合 组件名-版本号 => 组件对象 */
+    components?: Map<Key, Map<Key, Component>>
+}
+
+/**
  * 组件类的接口
  */
 export interface Component {
@@ -34,23 +54,6 @@ export interface Component {
 
     /** 实际组件 */
     readonly component: ProviderConstructor | (() => Promise<Module>) | undefined
-}
-
-/**
- * App类的接口
- */
-export interface App {
-    /** 应用名称 */
-    readonly name: Key
-
-    /** 应用描述信息 */
-    readonly description?: string
-
-    /** 启动应用实例 */
-    reactBoot?: ReactBootApplication
-
-    /** 组件集合 组件名-版本号 => 组件对象 */
-    components?: Map<Key, Map<Key, Component>>
 }
 
 /**

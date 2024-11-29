@@ -25,7 +25,7 @@ const ReactBoot = (config: ReactBootConfig) => {
         /** 模块加载完成的回调 */
         config.onLoad?.()
 
-        /** 启动应用 */
+        /** 运行应用启动类 */
         startReactBoot(config)
     })
 
