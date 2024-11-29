@@ -1,4 +1,4 @@
-import { App, type AsyncModule, ReactBootApplication, ReflectComponentMetaData } from '../interface'
+import type { App, AsyncModule, ReactBootApplication, ReflectComponentMetaData } from '../interface'
 
 /**
  * 类装饰器修饰的类型
@@ -44,6 +44,9 @@ export type ConsumerParams = ReflectComponentMetaData
  * ReactBoot启动类的配置
  */
 export type ReactBootConfig = {
+    /** React */
+    react: object
+
     /** 应用名称 */
     name: Key
 

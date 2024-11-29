@@ -4,6 +4,8 @@ import Application from './decorators/Application'
 import Provider from './decorators/Provider'
 import Consumer from './decorators/Consumer'
 import createApp from './hooks/createApp'
+import withProvider from './hooks/withProvider'
+import useConsumer from './hooks/useConsumer'
 import withAsyncModules from './hooks/withAsyncModules'
 import type { ReactBootConfig, ProviderParams, ConsumerParams } from './types'
 
@@ -37,6 +39,8 @@ const ReactBoot = (config: ReactBootConfig) => {
         Application: Application(config),
         Provider: (params: ProviderParams) => Provider(config, params),
         Consumer: (params: ConsumerParams) => Consumer(config, params),
+        withProvider: <T>(params: ProviderParams) => withProvider<T>(config, params),
+        useConsumer: <T>(params: ConsumerParams) => useConsumer<T>(config, params),
     }
 }
 

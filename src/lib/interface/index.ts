@@ -1,4 +1,4 @@
-import type { Key, Module, ProviderConstructor } from '../types'
+import type { Key, Module } from '../types'
 
 /**
  * 启动类的接口
@@ -53,7 +53,7 @@ export interface Component {
     readonly isAsync?: boolean
 
     /** 实际组件 */
-    readonly component: ProviderConstructor | (() => Promise<Module>) | undefined
+    readonly component: any
 }
 
 /**

@@ -1,5 +1,5 @@
 import type { Component } from '../interface'
-import type { Key, Module, ProviderConstructor } from '../types'
+import type { Key } from '../types'
 
 /**
  * 组件类
@@ -9,7 +9,7 @@ class ComponentClass implements Component {
     readonly version?: Key
     readonly description?: string
     readonly isAsync?: boolean = false
-    readonly component: ProviderConstructor | (() => Promise<Module>) | undefined
+    readonly component: any
 
     constructor(params: Component) {
         this.name = params.name

@@ -1,5 +1,5 @@
 import ReactBootError from '../exception'
-import { getComponent } from '../core'
+import { getComponent, log } from '../core'
 import type { ConsumerParams, Descriptor, ReactBootConfig } from '../types'
 import type { Component } from '../interface'
 
@@ -9,13 +9,14 @@ import type { Component } from '../interface'
  * @param consumerParams
  */
 const Consumer = (config: ReactBootConfig, consumerParams: ConsumerParams) => {
-    const { name } = consumerParams
+    const { name } = consumerParams || {}
     return (target: any, propertyKey: string, descriptor: Descriptor) => {
-        if (!name) {
-            throw new ReactBootError('@Consumer params name is required')
-        }
         if (!propertyKey || !descriptor) {
             throw new ReactBootError('@Consumer must be used on class properties')
+        }
+        if (!name) {
+            log('@Consumer params name is required', 'warn')
+            return descriptor
         }
         let value = descriptor.value ?? descriptor.initializer?.call?.(target)
         let comp: Component | undefined
