@@ -125,8 +125,11 @@ export const bindReactBoot = (appParams: App) => {
         // 绑定销毁事件
         const destroy = reactBoot.destroy?.bind?.(this)
         reactBoot.destroy = () => {
+            // 销毁方法
             destroy?.()
+            // 移除应用
             removeApp(appParams)
+
             log(`[${String(name)}] Application destroy success`)
         }
         log(`[${String(name)}] App ReactBoot bind success`)
@@ -153,6 +156,28 @@ export const startReactBoot = (appParams: App) => {
         log(`[${String(name)}] App ReactBoot run success`)
     } catch (e) {
         log(`[${String(name)}] App ReactBoot run Fail: ${e}`, 'error')
+    }
+}
+
+/**
+ * 销毁应用方法
+ * @param appParams
+ */
+export const destroyApp = (appParams: App) => {
+    const { name } = appParams
+    try {
+        const app = getApp(appParams)
+        // 获取启动类实例
+        const reactBoot = app.reactBoot
+        if (!reactBoot) {
+            throw new ReactBootError(`[${String(name)}] destroy reactBoot is not found`)
+        }
+        // 运行销毁方法, 其中会从ioc中删除app
+        reactBoot.destroy?.()
+
+        log(`[${String(name)}] App ReactBoot destroy success`)
+    } catch (e) {
+        log(`[${String(name)}] App ReactBoot destroy Fail: ${e}`, 'error')
     }
 }
 

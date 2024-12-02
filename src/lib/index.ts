@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { registerApp, startReactBoot, loadModules } from './core'
+import { registerApp, startReactBoot, loadModules, destroyApp } from './core'
 import Application from './decorators/Application'
 import Provider from './decorators/Provider'
 import Consumer from './decorators/Consumer'
@@ -35,6 +35,7 @@ const ReactBoot = (config: ReactBootConfig) => {
      */
     return {
         createApp: createApp(config),
+        destroyApp: () => destroyApp(config),
         Application: Application(config),
         Provider: (params: ProviderParams) => Provider(config, params),
         Consumer: (params: ConsumerParams) => Consumer(config, params),
