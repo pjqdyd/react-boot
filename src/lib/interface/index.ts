@@ -1,4 +1,4 @@
-import type { Key, Module } from '../types'
+import type { Key } from '../types'
 
 /**
  * 启动类的接口
@@ -66,34 +66,9 @@ export interface ReflectComponentMetaData {
     /** 组件版本 */
     readonly version?: Key
 
+    /** 是否异步组件 */
+    readonly isAsync?: boolean
+
     /** 组件描述信息 */
     readonly description?: string
-}
-
-/**
- *  异步模块
- */
-export interface AsyncModule extends ReflectComponentMetaData {
-    /** 是否异步 */
-    isAsync: boolean
-
-    /** 异步模块 */
-    module: () => Promise<Module>
-}
-
-/**
- * 异步模块集合类型
- */
-export interface AsyncModules {
-    [key: string]: AsyncModule
-}
-
-/**
- * 异步模块配置
- */
-export interface AsyncModuleOption extends ReflectComponentMetaData {
-    /** 异步模块 */
-    module: {
-        [key: string]: () => Promise<Module>
-    }
 }

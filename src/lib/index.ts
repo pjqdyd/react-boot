@@ -6,7 +6,6 @@ import Consumer from './decorators/Consumer'
 import createApp from './hooks/createApp'
 import withProvider from './hooks/withProvider'
 import useConsumer from './hooks/useConsumer'
-import withAsyncModules from './hooks/withAsyncModules'
 import type { ReactBootConfig, ProviderParams, ConsumerParams } from './types'
 
 /**
@@ -48,4 +47,4 @@ export * from './types'
 
 export * from './interface'
 
-export { ReactBoot, withAsyncModules }
+export { ReactBoot }

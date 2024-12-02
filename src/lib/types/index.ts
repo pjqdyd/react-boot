@@ -1,4 +1,4 @@
-import type { App, AsyncModule, ReactBootApplication, ReflectComponentMetaData } from '../interface'
+import type { App, ReactBootApplication, ReflectComponentMetaData } from '../interface'
 
 /**
  * 类装饰器修饰的类型
@@ -68,10 +68,15 @@ export type ReactBootParams = ReactBootConfig & ApplicationParams
 export type Module = { readonly default: any }
 
 /**
- * 依赖的模块集合类型
+ * 异步模块类型
+ */
+export type AsyncModule = () => Promise<Module>
+
+/**
+ * 依赖注入的模块集合类型
  */
 export type Modules = {
-    /** key-模块名称, value-模块对象/异步模块对象 */
+    /** key-模块名称, value-模块对象/异步模块函数 */
     [key: string]: Module | AsyncModule
 }
 

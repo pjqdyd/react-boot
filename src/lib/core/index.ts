@@ -1,8 +1,8 @@
 import AppClass from '../core/App'
 import Component from '../core/Component'
 import ReactBootError from '../exception'
-import type { ConsumerParams, IocMap, Module, ReactBootConfig, ReactBootParams } from '../types'
-import type { App, AsyncModule, ReflectComponentMetaData } from '../interface'
+import type { ConsumerParams, IocMap, ReactBootConfig, ReactBootParams, Module, AsyncModule } from '../types'
+import type { App, ReflectComponentMetaData } from '../interface'
 
 /**
  * ReactBoot版本号
@@ -306,37 +306,27 @@ export const execModulesLoad = async (params: ReactBootParams) => {
             .forEach((path) => {
                 const mod = modsMap[path]
                 const modType = Object.prototype.toString.call(mod)
+                let component = undefined
                 // 同步引入的模块
                 if (modType === '[object Module]') {
-                    const component = (mod as Module).default
-                    if (component) {
-                        const metaData: ReflectComponentMetaData = Reflect.getMetadata(REFLECT_COMPONENT_KEY, component)
-                        // 注册Provider修饰的组件
-                        if (metaData) {
-                            registerComponent(params, {
-                                name: metaData.name,
-                                version: metaData.version,
-                                description: metaData.description,
-                                isAsync: false,
-                                component: component,
-                            })
-                        }
-                    }
-                } else if (modType === '[object Object]') {
-                    // 通过withAsyncModules引入的异步模块
-                    const asyncMod = mod as AsyncModule
-                    if (asyncMod.isAsync) {
+                    component = (mod as Module).default
+                }
+                // 异步引入的模块
+                if (modType === '[object Function]') {
+                    component = mod as AsyncModule
+                }
+                if (component) {
+                    const metaData: ReflectComponentMetaData = Reflect.getMetadata(REFLECT_COMPONENT_KEY, component)
+                    // 注册Provider修饰/withProvider包裹的组件
+                    if (metaData) {
                         registerComponent(params, {
-                            name: asyncMod.name,
-                            version: asyncMod.version,
-                            description: asyncMod.description,
-                            isAsync: true,
-                            component: asyncMod.module,
+                            name: metaData.name,
+                            version: metaData.version,
+                            description: metaData.description,
+                            isAsync: Boolean(metaData.isAsync),
+                            component: component,
                         })
                     }
-                } else if (modType === '[object Function]') {
-                    // 直接异步引入的模块
-                    log(`[${path}] Async Module should use "withAsyncModules" defined`, 'warn')
                 }
             })
     } catch (e) {

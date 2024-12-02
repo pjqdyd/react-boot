@@ -9,7 +9,7 @@ import type { ReflectComponentMetaData } from '../interface'
  * @param providerParams
  */
 const Provider = (config: ReactBootConfig, providerParams: ProviderParams) => {
-    const { name, version, description } = providerParams
+    const { name, version, isAsync, description } = providerParams || {}
     return (target?: ProviderConstructor) => {
         if (!name) {
             throw new ReactBootError('@Provider params name is required')
@@ -21,6 +21,7 @@ const Provider = (config: ReactBootConfig, providerParams: ProviderParams) => {
         const metaData: ReflectComponentMetaData = {
             name,
             version,
+            isAsync,
             description,
         }
         Reflect.defineMetadata(REFLECT_COMPONENT_KEY, metaData, target)
