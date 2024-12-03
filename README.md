@@ -4,15 +4,15 @@
 <div align="center" 
      style="
         width: 100%; 
-        height: 90px; 
+        height: 100px; 
         display: flex; 
         flex-direction:column; 
         justify-content: center; 
         align-items: center;">
-            <img width="60" height="60" src="./src/assets/react-boot.svg" alt="react-boot" />
-            <h1 style="display: inline-block; font-size: 22px; line-height: 30px; font-weight: bold;">
+            <img width="70" height="70" src="./src/assets/react-boot.svg" alt="react-boot" />
+            <h1 style="display: inline-block; font-size: 20px; line-height: 20px; font-weight: bold;">
                 <b>react-boot</b>
-            </h2>
+            </h1>
 </div>
 
 <p align="middle">
