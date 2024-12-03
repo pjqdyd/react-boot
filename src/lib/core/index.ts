@@ -35,7 +35,7 @@ export const DEFAULT_COMPONENT_VERSION = Symbol('default_component_version')
  * @param type
  */
 const colors = {
-    log: '#7DB150',
+    log: '#667EDE',
     warn: '#D9A557',
     error: '#EC4949',
 }

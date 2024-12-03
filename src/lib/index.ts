@@ -35,8 +35,8 @@ const ReactBoot = (config: ReactBootConfig) => {
      */
     return {
         createApp: createApp(config),
-        destroyApp: () => destroyApp(config),
         Application: Application(config),
+        destroyApp: () => destroyApp(config),
         Provider: (params: ProviderParams) => Provider(config, params),
         Consumer: (params: ConsumerParams) => Consumer(config, params),
         withProvider: <T>(params: ProviderParams) => withProvider<T>(config, params),
