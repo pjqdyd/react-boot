@@ -63,7 +63,7 @@ export type ReactBootConfig = {
 export type ReactBootParams = ReactBootConfig & ApplicationParams
 
 /**
- * ReactBoot启动类返回类型
+ * ReactBoot启动函数返回类型
  */
 export type ReactBootReturns = {
     /** 创建应用启动函数 */
