@@ -1,7 +1,7 @@
 import AppClass from '../core/App'
 import Component from '../core/Component'
 import ReactBootError from '../exception'
-import type { ConsumerParams, IocMap, ReactBootConfig, ReactBootParams, Module, AsyncModule } from '../types'
+import type { ConsumerParams, IocMap, ReactBootConfig, ReactBootParams, Module, AsyncModule, Modules } from '../types'
 import type { App, ReflectComponentMetaData } from '../interface'
 
 /**
@@ -324,8 +324,8 @@ export const execModulesLoad = async (params: ReactBootParams) => {
         }
         // 加载引入的模块
         const mods = modules.then ? await modules : modules
-        // 支持同步或异步引入的模块
-        const modsMap = (mods as Module)?.default || mods
+        // 获取模块map集合
+        const modsMap: Modules = (mods as Module)?.default || mods
         Object.keys(modsMap)
             .filter((path) => Boolean(modsMap[path]))
             .forEach((path) => {

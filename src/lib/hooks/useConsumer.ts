@@ -15,7 +15,7 @@ const useConsumer = <T>(config: ReactBootConfig, consumerParams: ConsumerParams)
         return [null as T]
     }
     if (!react) {
-        log('useConsumer depends on the React function component，You should set the react parameters', 'error')
+        log('useConsumer depends on the React.useRef，You should config the react parameters', 'error')
         return [null as T]
     }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

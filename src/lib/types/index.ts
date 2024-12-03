@@ -44,7 +44,7 @@ export type ConsumerParams = ReflectComponentMetaData
  * ReactBoot启动类的配置
  */
 export type ReactBootConfig = {
-    /** React */
+    /** React对象 类型为(typeof React) */
     react: object
 
     /** 应用名称 */
@@ -54,13 +54,39 @@ export type ReactBootConfig = {
     description: string
 
     /** 应用模块加载完成的回调 */
-    onLoad?: () => void
+    onload?: () => void
 }
 
 /**
  * ReactBoot启动类参数
  */
 export type ReactBootParams = ReactBootConfig & ApplicationParams
+
+/**
+ * ReactBoot启动类返回类型
+ */
+export type ReactBootReturns = {
+    /** 创建应用启动函数 */
+    createApp: (options: ReactBootApplication & ApplicationParams) => ReactBootApplication | void
+
+    /** 应用启动类装饰器 */
+    Application: (target?: ReactBootConstructor | ApplicationParams | undefined) => any
+
+    /** 销毁应用函数 */
+    destroyApp: () => void
+
+    /** 提供者装饰器 */
+    Provider: (params: ProviderParams) => (target?: ProviderConstructor) => void
+
+    /** 消费者装饰器 */
+    Consumer: (params: ConsumerParams) => (target: any, propertyKey: string, descriptor: Descriptor) => Descriptor
+
+    /** 提供者hooks */
+    withProvider: <T>(params: ProviderParams) => (target: T) => T
+
+    /** 消费者hooks */
+    useConsumer: <T>(params: ConsumerParams) => T[]
+}
 
 /**
  * 模块类型

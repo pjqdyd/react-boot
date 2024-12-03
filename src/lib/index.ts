@@ -6,14 +6,14 @@ import Consumer from './decorators/Consumer'
 import createApp from './hooks/createApp'
 import withProvider from './hooks/withProvider'
 import useConsumer from './hooks/useConsumer'
-import type { ReactBootConfig, ProviderParams, ConsumerParams } from './types'
+import type { ReactBootConfig, ProviderParams, ConsumerParams, ReactBootReturns } from './types'
 
 /**
  * ReactBoot 启动器
- * @constructor
  * @param config
+ * @return ReactBootReturns
  */
-const ReactBoot = (config: ReactBootConfig) => {
+const ReactBoot = (config: ReactBootConfig): ReactBootReturns => {
     /**
      * 注册应用
      */
@@ -24,14 +24,14 @@ const ReactBoot = (config: ReactBootConfig) => {
      */
     loadModules(config).then(() => {
         /** 模块加载完成的回调 */
-        config.onLoad?.()
+        config.onload?.()
 
         /** 运行应用启动类 */
         startReactBoot(config)
     })
 
     /**
-     * 暴露应用及组件方法
+     * 暴露应用装饰器及组件hooks方法
      */
     return {
         createApp: createApp(config),
