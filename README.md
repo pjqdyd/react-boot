@@ -1,15 +1,18 @@
 
 #### React Boot NPM包
 
-<div style="
-    width: 100%; 
-    height: 90px; 
-    display: flex; 
-    flex-direction:column; 
-    justify-content: center; 
-    align-items: center;">
-        <img width="50" height="50" src="./src/assets/react-boot.svg" alt="react-boot" />
-        <div style="display: inline-block; font-size: 22px; line-height: 40px; font-weight: bold;">react-boot</div>
+<div align="center" 
+     style="
+        width: 100%; 
+        height: 90px; 
+        display: flex; 
+        flex-direction:column; 
+        justify-content: center; 
+        align-items: center;">
+            <img width="60" height="60" src="./src/assets/react-boot.svg" alt="react-boot" />
+            <h1 style="display: inline-block; font-size: 22px; line-height: 30px; font-weight: bold;">
+                <b>react-boot</b>
+            </h2>
 </div>
 
 <p align="middle">
