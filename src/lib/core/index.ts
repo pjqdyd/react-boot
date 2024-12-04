@@ -128,7 +128,6 @@ export const bindReactBoot = (app: App, reactBoot: ReactBootApplication) => {
  * @param app
  */
 export const startReactBoot = (app: App) => {
-    const { name } = app
     try {
         // 获取启动类实例
         const reactBoot = app.reactBoot
@@ -232,7 +231,8 @@ export function getComponent(app: App, consumerParams: ConsumerParams) {
         const componentInstance = app.components?.get(compName)?.get(version)
 
         if (!componentInstance) {
-            throw new ReactBootError(`${title} Component is not found`)
+            app.logger(`${title} Component is not found`, 'error')
+            return
         }
         app.logger(`${title} ${componentInstance.isAsync ? 'Async' : ''} Component get success`)
 
