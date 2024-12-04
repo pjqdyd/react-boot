@@ -1,14 +1,14 @@
 import { REFLECT_COMPONENT_KEY } from '../core'
 import ReactBootError from '../exception'
-import type { ProviderConstructor, ProviderParams, ReactBootConfig } from '../types'
-import type { ReflectComponentMetaData } from '../interface'
+import type { ProviderConstructor, ProviderParams } from '../types'
+import type { App, ReflectComponentMetaData } from '../interface'
 
 /**
  * Provider 组件提供装饰器
- * @param config
+ * @param app
  * @param providerParams
  */
-const Provider = (config: ReactBootConfig, providerParams: ProviderParams) => {
+const Provider = (app: App, providerParams: ProviderParams) => {
     const { name, version, isAsync, description } = providerParams || {}
     return (target?: ProviderConstructor) => {
         if (!name) {

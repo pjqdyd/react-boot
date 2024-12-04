@@ -1,13 +1,14 @@
 import { getComponent, log } from '../core'
-import type { ConsumerParams, ReactBootConfig } from '../types'
-import type { Component } from '../interface'
+import type { ConsumerParams } from '../types'
+import type { ReactBootConfig, App, Component } from '../interface'
 
 /**
  * Consumer 组件消费hooks
+ * @param app
  * @param config
  * @param consumerParams
  */
-const useConsumer = <T>(config: ReactBootConfig, consumerParams: ConsumerParams) => {
+const useConsumer = <T>(app: App, consumerParams: ConsumerParams, config: ReactBootConfig) => {
     const { react } = config || {}
     const { name } = consumerParams || {}
     if (!name) {
@@ -22,7 +23,7 @@ const useConsumer = <T>(config: ReactBootConfig, consumerParams: ConsumerParams)
     // @ts-ignore
     const comp = react.useRef<Component>()
     if (!comp.current) {
-        comp.current = getComponent(config, consumerParams)
+        comp.current = getComponent(app, consumerParams)
     }
     return [comp.current?.component as T]
 }

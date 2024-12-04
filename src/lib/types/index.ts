@@ -41,54 +41,6 @@ export type ProviderParams = ReflectComponentMetaData
 export type ConsumerParams = ReflectComponentMetaData
 
 /**
- * ReactBoot启动类的配置
- */
-export type ReactBootConfig = {
-    /** React对象 类型为(typeof React) */
-    react: object
-
-    /** 应用名称 */
-    name: Key
-
-    /** 应用描述 */
-    description: string
-
-    /** 应用模块加载完成的回调 */
-    onload?: () => void
-}
-
-/**
- * ReactBoot启动类参数
- */
-export type ReactBootParams = ReactBootConfig & ApplicationParams
-
-/**
- * ReactBoot启动函数返回类型
- */
-export type ReactBootReturns = {
-    /** 创建应用启动函数 */
-    createApp: (options: ReactBootApplication & ApplicationParams) => ReactBootApplication | void
-
-    /** 应用启动类装饰器 */
-    Application: (target?: ReactBootConstructor | ApplicationParams | undefined) => any
-
-    /** 销毁应用函数 */
-    destroyApp: () => void
-
-    /** 提供者装饰器 */
-    Provider: (params: ProviderParams) => (target?: ProviderConstructor) => void
-
-    /** 消费者装饰器 */
-    Consumer: (params: ConsumerParams) => (target: any, propertyKey: string, descriptor: Descriptor) => Descriptor
-
-    /** 提供者hooks */
-    withProvider: <T>(params: ProviderParams) => (target: T) => T
-
-    /** 消费者hooks */
-    useConsumer: <T>(params: ConsumerParams) => T[]
-}
-
-/**
  * 模块类型
  */
 export type Module = { readonly default: any }
@@ -109,7 +61,7 @@ export type Modules = {
 /**
  * 扫描的模块类型
  */
-export type ScanModules = Modules | Promise<{ readonly default: Modules }>
+export type ScanModules = Modules | Promise<{ readonly default: Modules }> | undefined
 
 /**
  * 应用启动类装饰器参数
@@ -119,4 +71,45 @@ export type ApplicationParams = {
      * 扫描的模块
      */
     modules?: ScanModules
+}
+
+/**
+ * App参数类型
+ */
+export type AppParams = App & ApplicationParams
+
+/**
+ * App选项类型
+ */
+export type AppOptions = ReactBootApplication & ApplicationParams
+
+/**
+ * Application 修饰目标参数类型
+ */
+export type ApplicationTarget = ReactBootConstructor | ApplicationParams | undefined
+
+/**
+ * ReactBoot启动函数返回类型
+ */
+export type ReactBootReturns = {
+    /** 创建应用启动函数 */
+    createApp: (options: AppOptions) => ReactBootApplication | void
+
+    /** 应用启动类装饰器 */
+    Application: (target?: ApplicationTarget) => any
+
+    /** 销毁应用函数 */
+    destroyApp: () => void
+
+    /** 提供者装饰器 */
+    Provider: (params: ProviderParams) => (target?: ProviderConstructor) => void
+
+    /** 消费者装饰器 */
+    Consumer: (params: ConsumerParams) => (target: any, propertyKey: string, descriptor: Descriptor) => Descriptor
+
+    /** 提供者hooks */
+    withProvider: <T>(params: ProviderParams) => (target: T) => T
+
+    /** 消费者hooks */
+    useConsumer: <T>(params: ConsumerParams) => T[]
 }

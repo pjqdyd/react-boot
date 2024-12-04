@@ -1,8 +1,8 @@
 import AppClass from '../core/App'
 import Component from '../core/Component'
 import ReactBootError from '../exception'
-import type { ConsumerParams, IocMap, ReactBootConfig, ReactBootParams, Module, AsyncModule, Modules } from '../types'
-import type { App, ReflectComponentMetaData } from '../interface'
+import type { ConsumerParams, IocMap, Module, AsyncModule, Modules, ScanModules } from '../types'
+import type { ReactBootConfig, App, ReactBootApplication, ReflectComponentMetaData } from '../interface'
 
 /**
  * ReactBoot版本号
@@ -78,6 +78,7 @@ export const registerApp = (config: ReactBootConfig) => {
         return app
     } catch (e) {
         log(`App register Fail: ${e}`, 'error')
+        throw e
     }
 }
 
@@ -111,27 +112,28 @@ export const removeApp = (appParams: Partial<App>) => {
 
 /**
  * 绑定应用启动类
- * @param appParams
+ * @param app
+ * @param reactBoot
  */
-export const bindReactBoot = (appParams: App) => {
-    const { reactBoot, name } = appParams
+export const bindReactBoot = (app: App, reactBoot: ReactBootApplication) => {
+    const { name } = app
     try {
-        const app = getApp(appParams)
         if (!reactBoot) {
             throw new ReactBootError(`[${String(name)}] bindApp reactBoot is required`)
         }
-        // 绑定启动类
-        app.reactBoot = reactBoot
         // 绑定销毁事件
         const destroy = reactBoot.destroy?.bind?.(this)
         reactBoot.destroy = () => {
             // 销毁方法
             destroy?.()
             // 移除应用
-            removeApp(appParams)
+            removeApp(app)
 
             log(`[${String(name)}] Application destroy success`)
         }
+        // 绑定启动类
+        app.reactBoot = reactBoot
+
         log(`[${String(name)}] App ReactBoot bind success`)
     } catch (e) {
         log(`[${String(name)}] App ReactBoot bind Fail: ${e}`, 'error')
@@ -140,12 +142,11 @@ export const bindReactBoot = (appParams: App) => {
 
 /**
  * 运行应用启动类run方法
- * @param appParams
+ * @param app
  */
-export const startReactBoot = (appParams: App) => {
-    const { name } = appParams
+export const startReactBoot = (app: App) => {
+    const { name } = app
     try {
-        const app = getApp(appParams)
         // 获取启动类实例
         const reactBoot = app.reactBoot
         if (!reactBoot) {
@@ -153,6 +154,7 @@ export const startReactBoot = (appParams: App) => {
         }
         // 运行启动方法
         reactBoot.run?.()
+
         log(`[${String(name)}] App ReactBoot run success`)
     } catch (e) {
         log(`[${String(name)}] App ReactBoot run Fail: ${e}`, 'error')
@@ -161,19 +163,25 @@ export const startReactBoot = (appParams: App) => {
 
 /**
  * 销毁应用方法
- * @param appParams
+ * @param app
  */
-export const destroyApp = (appParams: App) => {
-    const { name } = appParams
+export const destroyApp = (app: App) => {
+    const name = app?.name
     try {
-        const app = getApp(appParams)
         // 获取启动类实例
-        const reactBoot = app.reactBoot
+        const reactBoot = app?.reactBoot
         if (!reactBoot) {
             throw new ReactBootError(`[${String(name)}] destroy reactBoot is not found`)
         }
         // 运行销毁方法, 其中会从ioc中删除app
         reactBoot.destroy?.()
+
+        // 清空app对象
+        Object.keys(app).forEach((key) => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            delete app[key]
+        })
 
         log(`[${String(name)}] App ReactBoot destroy success`)
     } catch (e) {
@@ -183,15 +191,14 @@ export const destroyApp = (appParams: App) => {
 
 /**
  * 注册组件到IOC容器
- * @param appParams
+ * @param app
  * @param componentParams
  */
-export const registerComponent = (appParams: Partial<App>, componentParams: Component) => {
-    const { name: appName } = appParams
+export const registerComponent = (app: App, componentParams: Component) => {
+    const { name: appName } = app
     const { name: compName, version = DEFAULT_COMPONENT_VERSION, isAsync, component, description } = componentParams
     const title = `[${String(appName)}] [${String(compName)} ${String(version)}] ${isAsync ? 'Async' : ''}`
     try {
-        const app = getApp(appParams)
         // 如果组件名称或版本为空
         if (!compName || !version) {
             throw new ReactBootError(`${title} Component name、version is required`)
@@ -228,15 +235,14 @@ export const registerComponent = (appParams: Partial<App>, componentParams: Comp
 
 /**
  * 获取IOC中的组件实例
- * @param appParams
+ * @param app
  * @param consumerParams
  */
-export function getComponent(appParams: Partial<App>, consumerParams: ConsumerParams) {
-    const { name: appName } = appParams
+export function getComponent(app: App, consumerParams: ConsumerParams) {
+    const { name: appName } = app
     const { name: compName, version = DEFAULT_COMPONENT_VERSION } = consumerParams
     const title = `[${String(appName)}] [${String(compName)} ${String(version)}]`
     try {
-        const app = getApp(appParams)
         // 如果组件名称或版本为空
         if (!compName || !version) {
             throw new ReactBootError(`${title} Consumer Component name、version is required`)
@@ -259,20 +265,20 @@ export function getComponent(appParams: Partial<App>, consumerParams: ConsumerPa
  * bindModules 绑定模块加载器
  * 使用生成器模式，保证在未来某一时刻加载模块
  * 保证模块在应用注册后，应用启动前加载，避免阻塞，造成循环依赖
- * @param params
+ * @param app
+ * @param modules
  */
-function* modulesLoaderGenerator(params: ReactBootParams) {
+function* modulesLoaderGenerator(app: App, modules: ScanModules) {
     /**
      * 等待执行加载模块
      */
-    yield execModulesLoad(params)
+    yield execModulesLoad(app, modules)
 }
-export const bindModules = (params: ReactBootParams) => {
-    const { name } = params
+export const bindModules = (app: App, modules: ScanModules) => {
+    const { name } = app
     try {
-        const app = getApp(params)
         // 绑定模块加载器
-        app.modulesLoader = modulesLoaderGenerator(params)
+        app.modulesLoader = modulesLoaderGenerator(app, modules)
 
         log(`[${String(name)}] Modules loader bind success`)
     } catch (e) {
@@ -282,18 +288,17 @@ export const bindModules = (params: ReactBootParams) => {
 
 /**
  * 加载模块
- * @param params
+ * @param app
  */
-export const loadModules = (params: ReactBootParams) => {
+export const loadModules = (app: App) => {
     return new Promise<void>((resolve, reject) => {
-        const { name } = params
+        const { name } = app
         const start = new Date().getTime()
         /**
          * 使用生成器加载模块
          * 保证模块加载异步执行，避免阻塞，造成循环依赖
          */
         Promise.resolve().then(() => {
-            const app = getApp(params)
             const loader = app.modulesLoader?.next?.()
             if (!loader || loader.done) {
                 log(`[${String(name)}] Modules Loader is ${loader?.done ? 'done' : 'undefined'}`, 'warn')
@@ -312,11 +317,12 @@ export const loadModules = (params: ReactBootParams) => {
 
 /**
  * 执行模块加载
- * @param params
+ * @param app
+ * @param modules
  */
-export const execModulesLoad = async (params: ReactBootParams) => {
+export const execModulesLoad = async (app: App, modules: ScanModules) => {
     try {
-        const { modules, name } = params
+        const { name } = app
         if (!modules) {
             const info = `Modules is not defined (please use @Application({ modules }) or createApp({ modules, ... })`
             log(`[${String(name)}] ${info}`, 'warn')
@@ -344,7 +350,7 @@ export const execModulesLoad = async (params: ReactBootParams) => {
                     const metaData: ReflectComponentMetaData = Reflect.getMetadata(REFLECT_COMPONENT_KEY, component)
                     // 注册Provider修饰/withProvider包裹的组件
                     if (metaData) {
-                        registerComponent(params, {
+                        registerComponent(app, {
                             name: metaData.name,
                             version: metaData.version,
                             description: metaData.description,

@@ -1,21 +1,22 @@
 import { bindReactBoot, bindModules, removeApp, log } from '../core'
 import type { ReactBootApplication } from '../interface'
-import { ReactBootConstructor, ApplicationParams, ReactBootParams } from '../types'
+import type { AppParams, ApplicationTarget, ScanModules } from '../types'
 
 /**
  * Application 应用启动类装饰器
- * @param params
+ * @param app
+ * @param modules
  */
-const Application = (params: ReactBootParams) => {
-    const { name } = params
-    return (target?: ReactBootConstructor | ApplicationParams | undefined): ReactBootApplication | any => {
+const Application = (app: AppParams, modules?: ScanModules) => {
+    const { name } = app
+    return (target?: ApplicationTarget): ReactBootApplication | any => {
         if (!target) {
             // 使用装饰器 @Application()
-            return Application({ ...params })
+            return Application(app)
         }
         if (typeof target === 'object') {
             // 使用装饰器 @Application({...})
-            return Application({ ...params, modules: target.modules })
+            return Application(app, target.modules)
         }
         if (typeof target !== 'function') {
             // 未正确使用装饰器
@@ -28,10 +29,10 @@ const Application = (params: ReactBootParams) => {
             const reactBoot: ReactBootApplication = new target()
 
             // 绑定应用启动类
-            bindReactBoot({ name, reactBoot })
+            bindReactBoot(app, reactBoot)
 
             // 绑定模块加载器
-            bindModules(params)
+            bindModules(app, modules)
 
             // 返回启动类实例
             return reactBoot

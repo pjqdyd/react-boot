@@ -1,6 +1,23 @@
 import type { Key } from '../types'
 
 /**
+ * ReactBoot配置
+ */
+export interface ReactBootConfig {
+    /** React对象 类型为(typeof React) */
+    react: object
+
+    /** 应用名称 */
+    name: Key
+
+    /** 应用描述 */
+    description: string
+
+    /** 应用模块加载完成的回调 */
+    onload?: () => void
+}
+
+/**
  * 启动类的接口
  */
 export interface ReactBootApplication {
@@ -21,10 +38,10 @@ export interface ReactBootApplication {
  */
 export interface App {
     /** 应用名称 */
-    readonly name: Key
+    name: Key
 
     /** 应用描述信息 */
-    readonly description?: string
+    description?: string
 
     /** 启动应用实例 */
     reactBoot?: ReactBootApplication

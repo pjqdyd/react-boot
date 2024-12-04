@@ -1,16 +1,16 @@
 import { bindReactBoot, bindModules, log, removeApp } from '../core'
-import type { ApplicationParams, ReactBootConfig } from '../types'
-import type { ReactBootApplication } from '../interface'
+import type { AppOptions } from '../types'
+import type { App, ReactBootApplication } from '../interface'
 
 /**
  * 应用启动类hooks
- * @param params
+ * @param app
  */
-const createApp = (params: ReactBootConfig) => {
-    const { name } = params
+const createApp = (app: App) => {
+    const { name } = app
 
-    return (options: ReactBootApplication & ApplicationParams): ReactBootApplication | void => {
-        const { run, destroy } = options
+    return (options: AppOptions): ReactBootApplication | void => {
+        const { run, destroy } = options || {}
         if (typeof run !== 'function') {
             // 未正确使用 createApp
             log(`[${String(name)}] createApp options.run is not a function`, 'error')
@@ -25,10 +25,10 @@ const createApp = (params: ReactBootConfig) => {
             }
 
             // 绑定启动类
-            bindReactBoot({ name, reactBoot })
+            bindReactBoot(app, reactBoot)
 
             // 绑定模块加载器
-            bindModules({ ...params, modules: options.modules })
+            bindModules(app, options.modules)
 
             // 返回实例
             return reactBoot
