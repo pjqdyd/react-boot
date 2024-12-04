@@ -1,6 +1,6 @@
 import { log, needLog } from '../log'
 import type { App, Component, ReactBootApplication } from '../interface'
-import type { Key, LogType } from '../types'
+import type { Key, LogType, LogTypes } from '../types'
 
 /**
  * 应用类
@@ -22,7 +22,7 @@ class AppClass implements App {
         this.components = params.components || new Map()
     }
 
-    logger(message: string, type: LogType = 'log') {
+    logger(message: string, type: LogTypes = 'log') {
         if (needLog(type, this.logLevel)) {
             log(`[${String(this.name)}] ${message}`, type)
         }

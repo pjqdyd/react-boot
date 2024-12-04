@@ -1,4 +1,4 @@
-import type { Key, LogType } from '../types'
+import { Key, LogType, LogTypes } from '../types'
 
 /**
  * ReactBoot配置
@@ -59,7 +59,7 @@ export interface App {
     logLevel: LogType
 
     /** 应用日志输出 */
-    logger: (message: string, type?: LogType) => void
+    logger: (message: string, type?: LogTypes) => void
 }
 
 /**

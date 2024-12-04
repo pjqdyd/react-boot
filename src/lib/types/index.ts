@@ -36,6 +36,20 @@ export type IocMap = Map<Key, App>
 export type LogType = 'log' | 'warn' | 'error'
 
 /**
+ * 日志类型 (包含系统日志)
+ */
+export type LogTypes = LogType | 'system'
+
+/**
+ * 日志配置类型
+ */
+export type LogConfig = {
+    level: number
+    style: string
+    bgColor: string
+}
+
+/**
  * 提供者装饰器参数
  */
 export type ProviderParams = ReflectComponentMetaData

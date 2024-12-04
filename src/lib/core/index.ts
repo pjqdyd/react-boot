@@ -57,7 +57,7 @@ export const registerApp = (config: ReactBootConfig) => {
         // 注册创建的应用
         ioc.set(name, app)
         // 打印日志
-        app.logger(`Application register success`)
+        app.logger(`Application register success`, 'system')
         return app
     } catch (e) {
         log(`App register Fail: ${e}`, 'error')
@@ -138,9 +138,9 @@ export const startReactBoot = (app: App) => {
         // 运行启动方法
         reactBoot.run?.()
 
-        log(`[${String(name)}] App ReactBoot run success`)
+        app.logger(`App ReactBoot run success`, 'system')
     } catch (e) {
-        log(`[${String(name)}] App ReactBoot run Fail: ${e}`, 'error')
+        app.logger(`App ReactBoot run Fail: ${e}`, 'error')
     }
 }
 
@@ -272,7 +272,6 @@ export const bindModules = (app: App, modules: ScanModules) => {
  */
 export const loadModules = (app: App) => {
     return new Promise<void>((resolve, reject) => {
-        const { name } = app
         const start = new Date().getTime()
         /**
          * 使用生成器加载模块
@@ -287,7 +286,7 @@ export const loadModules = (app: App) => {
             loader.value
                 ?.then(() => {
                     const end = new Date().getTime()
-                    log(`[${String(name)}] All modules load success, cost ${end - start} ms`)
+                    app.logger(`All modules load success, cost ${end - start} ms`, 'system')
                     resolve()
                 })
                 .catch((e) => reject(e))

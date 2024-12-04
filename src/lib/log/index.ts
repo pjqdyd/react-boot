@@ -1,13 +1,14 @@
 import { version } from '../core'
-import type { LogType } from '../types'
+import { LogConfig, LogType, LogTypes } from '../types'
 
 /**
  * 日志类型
  */
-const types: Record<LogType, { level: number; color: string }> = {
-    log: { level: 1, color: '#667EDE' },
-    warn: { level: 2, color: '#D9A557' },
-    error: { level: 3, color: '#EC4949' },
+const types: Record<LogTypes, LogConfig> = {
+    log: { level: 1, bgColor: '#667EDE', style: '' },
+    warn: { level: 2, bgColor: '#D9A557', style: '' },
+    error: { level: 3, bgColor: '#EC4949', style: '' },
+    system: { level: 10, bgColor: '#667EDE', style: 'color: #667EDE; font-weight: bold;' },
 }
 
 /**
@@ -15,11 +16,13 @@ const types: Record<LogType, { level: number; color: string }> = {
  * @param message
  * @param type
  */
-export const log = (message: string, type: 'log' | 'warn' | 'error' = 'log') => {
+export const log = (message: string, type: LogTypes = 'log') => {
+    const t = types[type] || {}
+    if (type === 'system') type = 'log'
     console[type]?.(
-        `%c ReactBoot ${version}: `,
-        `color: #ffffff; font-weight: bold; background: ${types[type]?.color};`,
-        message,
+        `%c ReactBoot ${version}: %c ${message}`,
+        `color: #ffffff; font-weight: bold; background: ${t.bgColor};`,
+        `${t.style}`,
     )
 }
 
@@ -28,7 +31,7 @@ export const log = (message: string, type: 'log' | 'warn' | 'error' = 'log') => 
  * @param type
  * @param logLevel
  */
-export const needLog = (type: LogType, logLevel: LogType) => {
+export const needLog = (type: LogTypes, logLevel: LogType) => {
     return types[type]?.level >= types[logLevel]?.level
 }
 
