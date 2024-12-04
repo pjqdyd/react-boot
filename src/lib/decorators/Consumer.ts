@@ -1,5 +1,5 @@
 import ReactBootError from '../exception'
-import { getComponent, log } from '../core'
+import { getComponent } from '../core'
 import type { ConsumerParams, Descriptor } from '../types'
 import type { App, Component } from '../interface'
 
@@ -15,7 +15,7 @@ const Consumer = (app: App, consumerParams: ConsumerParams) => {
             throw new ReactBootError('@Consumer must be used on class properties')
         }
         if (!name) {
-            log('@Consumer params name is required', 'warn')
+            app.logger('@Consumer params name is required', 'warn')
             return descriptor
         }
         let value = descriptor.value ?? descriptor.initializer?.call?.(target)

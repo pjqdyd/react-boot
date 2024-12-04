@@ -1,4 +1,4 @@
-import { bindReactBoot, bindModules, log, removeApp } from '../core'
+import { bindReactBoot, bindModules, removeApp } from '../core'
 import type { AppOptions } from '../types'
 import type { App, ReactBootApplication } from '../interface'
 
@@ -13,7 +13,7 @@ const createApp = (app: App) => {
         const { run, destroy } = options || {}
         if (typeof run !== 'function') {
             // 未正确使用 createApp
-            log(`[${String(name)}] createApp options.run is not a function`, 'error')
+            app.logger(`createApp options.run is not a function`, 'error')
             return
         }
         // 直接使用 createApp(function, function)
@@ -34,7 +34,7 @@ const createApp = (app: App) => {
             return reactBoot
         } catch (e) {
             removeApp({ name })
-            log(`[${String(name)}] Application run fail: ${e}`, 'error')
+            app.logger(`Application run fail: ${e}`, 'error')
         }
     }
 }

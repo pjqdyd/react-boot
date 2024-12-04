@@ -1,3 +1,4 @@
+import log from '../log'
 import AppClass from '../core/App'
 import Component from '../core/Component'
 import ReactBootError from '../exception'
@@ -5,12 +6,12 @@ import type { ConsumerParams, IocMap, Module, AsyncModule, Modules, ScanModules 
 import type { ReactBootConfig, App, ReactBootApplication, ReflectComponentMetaData } from '../interface'
 
 /**
- * ReactBoot版本号
+ * ReactBoot 版本号
  */
 export const version = '1.0.4'
 
 /**
- * 应用Key
+ * ReactBoot Key
  */
 export const key = Symbol('ReactBoot')
 
@@ -28,24 +29,6 @@ export const REFLECT_COMPONENT_KEY = Symbol('reflect_component_key')
  * 默认组件版本号
  */
 export const DEFAULT_COMPONENT_VERSION = Symbol('default_component_version')
-
-/**
- * 打印日志
- * @param msg
- * @param type
- */
-const colors = {
-    log: '#667EDE',
-    warn: '#D9A557',
-    error: '#EC4949',
-}
-export const log = (message: string, type: 'log' | 'warn' | 'error' = 'log') => {
-    console[type]?.(
-        `%c ReactBoot ${version}: `,
-        `color: #ffffff; font-weight: bold; background: ${colors[type]};`,
-        message,
-    )
-}
 
 /**
  * 自执行初始化应用IOC容器
@@ -68,13 +51,13 @@ export const registerApp = (config: ReactBootConfig) => {
             throw new ReactBootError('App name is required')
         }
         if (ioc.has(name)) {
-            throw new ReactBootError(`App name is must be unique`)
+            throw new ReactBootError(`[${String(name)}] App name is must be unique`)
         }
         const app = new AppClass(config)
         // 注册创建的应用
         ioc.set(name, app)
         // 打印日志
-        log(`[${String(name)}] Application register success`)
+        app.logger(`Application register success`)
         return app
     } catch (e) {
         log(`App register Fail: ${e}`, 'error')
@@ -119,7 +102,7 @@ export const bindReactBoot = (app: App, reactBoot: ReactBootApplication) => {
     const { name } = app
     try {
         if (!reactBoot) {
-            throw new ReactBootError(`[${String(name)}] bindApp reactBoot is required`)
+            throw new ReactBootError(`bindApp reactBoot is required`)
         }
         // 绑定销毁事件
         const destroy = reactBoot.destroy?.bind?.(this)
@@ -134,9 +117,9 @@ export const bindReactBoot = (app: App, reactBoot: ReactBootApplication) => {
         // 绑定启动类
         app.reactBoot = reactBoot
 
-        log(`[${String(name)}] App ReactBoot bind success`)
+        app.logger(`App ReactBoot bind success`)
     } catch (e) {
-        log(`[${String(name)}] App ReactBoot bind Fail: ${e}`, 'error')
+        app.logger(`App ReactBoot bind Fail: ${e}`, 'error')
     }
 }
 
@@ -150,7 +133,7 @@ export const startReactBoot = (app: App) => {
         // 获取启动类实例
         const reactBoot = app.reactBoot
         if (!reactBoot) {
-            throw new ReactBootError(`[${String(name)}] reactBoot is not found`)
+            throw new ReactBootError(`reactBoot is not found`)
         }
         // 运行启动方法
         reactBoot.run?.()
@@ -171,7 +154,7 @@ export const destroyApp = (app: App) => {
         // 获取启动类实例
         const reactBoot = app?.reactBoot
         if (!reactBoot) {
-            throw new ReactBootError(`[${String(name)}] destroy reactBoot is not found`)
+            throw new ReactBootError(`destroy reactBoot is not found`)
         }
         // 运行销毁方法, 其中会从ioc中删除app
         reactBoot.destroy?.()
@@ -185,7 +168,7 @@ export const destroyApp = (app: App) => {
 
         log(`[${String(name)}] App ReactBoot destroy success`)
     } catch (e) {
-        log(`[${String(name)}] App ReactBoot destroy Fail: ${e}`, 'error')
+        app.logger(`App ReactBoot destroy Fail: ${e}`, 'error')
     }
 }
 
@@ -195,9 +178,8 @@ export const destroyApp = (app: App) => {
  * @param componentParams
  */
 export const registerComponent = (app: App, componentParams: Component) => {
-    const { name: appName } = app
     const { name: compName, version = DEFAULT_COMPONENT_VERSION, isAsync, component, description } = componentParams
-    const title = `[${String(appName)}] [${String(compName)} ${String(version)}] ${isAsync ? 'Async' : ''}`
+    const title = `[${String(compName)} ${String(version)}] ${isAsync ? 'Async' : ''}`
     try {
         // 如果组件名称或版本为空
         if (!compName || !version) {
@@ -225,11 +207,11 @@ export const registerComponent = (app: App, componentParams: Component) => {
             comp.set(version, componentInstance)
         }
 
-        log(`${title} Component register success`)
+        app.logger(`${title} Component register success`)
 
         return componentInstance
     } catch (e) {
-        log(`${title} Component register Fail: ${e}`, 'error')
+        app.logger(`${title} Component register Fail: ${e}`, 'error')
     }
 }
 
@@ -239,9 +221,8 @@ export const registerComponent = (app: App, componentParams: Component) => {
  * @param consumerParams
  */
 export function getComponent(app: App, consumerParams: ConsumerParams) {
-    const { name: appName } = app
     const { name: compName, version = DEFAULT_COMPONENT_VERSION } = consumerParams
-    const title = `[${String(appName)}] [${String(compName)} ${String(version)}]`
+    const title = `[${String(compName)} ${String(version)}]`
     try {
         // 如果组件名称或版本为空
         if (!compName || !version) {
@@ -253,11 +234,11 @@ export function getComponent(app: App, consumerParams: ConsumerParams) {
         if (!componentInstance) {
             throw new ReactBootError(`${title} Component is not found`)
         }
-        log(`${title} ${componentInstance.isAsync ? 'Async' : ''} Component get success`)
+        app.logger(`${title} ${componentInstance.isAsync ? 'Async' : ''} Component get success`)
 
         return componentInstance
     } catch (e) {
-        log(`${title} Component get fail: ${e}`, 'error')
+        app.logger(`${title} Component get fail: ${e}`, 'error')
     }
 }
 
@@ -275,14 +256,13 @@ function* modulesLoaderGenerator(app: App, modules: ScanModules) {
     yield execModulesLoad(app, modules)
 }
 export const bindModules = (app: App, modules: ScanModules) => {
-    const { name } = app
     try {
         // 绑定模块加载器
         app.modulesLoader = modulesLoaderGenerator(app, modules)
 
-        log(`[${String(name)}] Modules loader bind success`)
+        app.logger(`Modules loader bind success`)
     } catch (e) {
-        log(`[${String(name)}] Modules loader bind fail`, 'error')
+        app.logger(`Modules loader bind fail`, 'error')
     }
 }
 
@@ -301,7 +281,7 @@ export const loadModules = (app: App) => {
         Promise.resolve().then(() => {
             const loader = app.modulesLoader?.next?.()
             if (!loader || loader.done) {
-                log(`[${String(name)}] Modules Loader is ${loader?.done ? 'done' : 'undefined'}`, 'warn')
+                app.logger(`Modules Loader is ${loader?.done ? 'done' : 'undefined'}`, 'warn')
                 return resolve()
             }
             loader.value
@@ -322,10 +302,9 @@ export const loadModules = (app: App) => {
  */
 export const execModulesLoad = async (app: App, modules: ScanModules) => {
     try {
-        const { name } = app
         if (!modules) {
             const info = `Modules is not defined (please use @Application({ modules }) or createApp({ modules, ... })`
-            log(`[${String(name)}] ${info}`, 'warn')
+            app.logger(`${info}`, 'warn')
             return
         }
         // 加载引入的模块
@@ -361,6 +340,6 @@ export const execModulesLoad = async (app: App, modules: ScanModules) => {
                 }
             })
     } catch (e) {
-        log(`Modules load Fail: ${e}`, 'error')
+        app.logger(`Modules load Fail: ${e}`, 'error')
     }
 }

@@ -31,6 +31,11 @@ export type Key = string | symbol
 export type IocMap = Map<Key, App>
 
 /**
+ * 日志类型
+ */
+export type LogType = 'log' | 'warn' | 'error'
+
+/**
  * 提供者装饰器参数
  */
 export type ProviderParams = ReflectComponentMetaData

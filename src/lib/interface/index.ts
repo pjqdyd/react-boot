@@ -1,4 +1,4 @@
-import type { Key } from '../types'
+import type { Key, LogType } from '../types'
 
 /**
  * ReactBoot配置
@@ -12,6 +12,9 @@ export interface ReactBootConfig {
 
     /** 应用描述 */
     description: string
+
+    /** 应用日志级别, 默认 log */
+    logLevel?: LogType
 
     /** 应用模块加载完成的回调 */
     onload?: () => void
@@ -51,6 +54,12 @@ export interface App {
 
     /** 组件集合 组件名-版本号 => 组件对象 */
     components?: Map<Key, Map<Key, Component>>
+
+    /** 应用日志级别 */
+    logLevel: LogType
+
+    /** 应用日志输出 */
+    logger: (message: string, type?: LogType) => void
 }
 
 /**

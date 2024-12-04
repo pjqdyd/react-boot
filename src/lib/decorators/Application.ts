@@ -1,4 +1,4 @@
-import { bindReactBoot, bindModules, removeApp, log } from '../core'
+import { bindReactBoot, bindModules, removeApp } from '../core'
 import type { ReactBootApplication } from '../interface'
 import type { AppParams, ApplicationTarget, ScanModules } from '../types'
 
@@ -20,7 +20,7 @@ const Application = (app: AppParams, modules?: ScanModules) => {
         }
         if (typeof target !== 'function') {
             // 未正确使用装饰器
-            log(`[${String(name)}] @Application({...}) should be used on the class function`, 'error')
+            app.logger(`@Application({...}) should be used on the class function`, 'error')
             return
         }
         // 直接使用装饰器 @Application
@@ -38,7 +38,7 @@ const Application = (app: AppParams, modules?: ScanModules) => {
             return reactBoot
         } catch (e) {
             removeApp({ name })
-            log(`[${String(name)}] Application run fail: ${e}`, 'error')
+            app.logger(`Application run fail: ${e}`, 'error')
         }
     }
 }

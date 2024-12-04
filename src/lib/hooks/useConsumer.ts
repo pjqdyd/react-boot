@@ -1,4 +1,4 @@
-import { getComponent, log } from '../core'
+import { getComponent } from '../core'
 import type { ConsumerParams } from '../types'
 import type { ReactBootConfig, App, Component } from '../interface'
 
@@ -12,11 +12,11 @@ const useConsumer = <T>(app: App, consumerParams: ConsumerParams, config: ReactB
     const { react } = config || {}
     const { name } = consumerParams || {}
     if (!name) {
-        log('useConsumer params name is required', 'warn')
+        app.logger('useConsumer params name is required', 'warn')
         return [null as T]
     }
     if (!react) {
-        log('useConsumer depends on the React.useRef，You should config the react parameters', 'error')
+        app.logger('useConsumer depends on the React.useRef，You should config the react parameters', 'error')
         return [null as T]
     }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
