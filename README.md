@@ -107,6 +107,12 @@ yarn add @pjqdyd/ract-boot
  ├─vite.config.ts                vite配置文件
  └─package.json                  package.json文件
 ```
+在`tsconfig.json`中的`compilerOptions`添加如下配置，以开启装饰器语法和元数据支持：
+```json
+"declaration": true,
+"experimentalDecorators": true,
+"emitDecoratorMetadata": true,
+```
 
 二. 编辑`react-boot.ts`文件，添加如下代码，用于定义react-boot的API及装饰器hooks：
 ```ts
