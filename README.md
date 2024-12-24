@@ -16,7 +16,7 @@
 </div>
 
 <p align="middle">
-    <a href="https://www.npmjs.com/package/@pjqdyd/npm-ts-demo" target="_blank">
+    <a href="https://www.npmjs.com/package/@pjqdyd/react-boot" target="_blank">
         <img src="https://badgen.net/badge/version/v1.0.5"/>
     </a>
     <img src="https://badgen.net/badge/language/typescript/cyan"/>
