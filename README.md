@@ -344,7 +344,7 @@ destroyApp: () => void
     - 刚开始考虑过vite插件机制，通过扫描读取文件来注入模块，但这样可能会导致vite打包速度变慢，
       并且会额外增加使用成本，使用vite插件的局限性，如果要在webpack项目中使用还得提供webpack插件，
       最终采用了vite的import.meta.glob来扫描模块，通过动态批量导入的方式来注入模块,
-      这样webpack项目的require.context也能够支持
+      这样webpack项目的require.context也能够支持，加上装饰器和反射元数据来过滤需要注入的模块
 - 如何保证加载模块和消费模块的顺序
     - 因为整个ReactBoot核心都是在运行时执行，那么只需要将模块加载的过程，放在run方法(启动react应用)之前同步执行就行了
 - 如何解决加载模块循环依赖的问题
