@@ -303,7 +303,7 @@ export default Home
 ```
 运行启动项目后，访问Home首页：
 <br/>
-<img src="./src/assets/react-boot-demo.png" alt="react-boot-demo" width="600">
+<img src="./src/assets/react-boot-demo.png" alt="react-boot-demo" width="750">
 <br/>
 总结：项目启动后会在控制台打印应用的启动信息、模块的加载及注入信息、模块组件的版本及使用信息。
 
