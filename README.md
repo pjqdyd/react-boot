@@ -24,7 +24,7 @@
     <img src="https://badgen.net/badge/package/npm/blue"/>
     <img src="https://badgen.net/badge/license/MIT/green"/>
     <img src="https://badgen.net/badge/contributors/1/blue"/>
-    <img src="https://badgen.net/badge/package size/172kb/blue"/>
+    <img src="https://badgen.net/badge/package size/17.7kb/blue"/>
 </p>
 
 ---
