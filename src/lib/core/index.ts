@@ -8,7 +8,7 @@ import type { ReactBootConfig, App, ReactBootApplication, ReflectComponentMetaDa
 /**
  * ReactBoot 版本号
  */
-export const version = '1.0.4'
+export const version = '1.0.5'
 
 /**
  * ReactBoot Key
