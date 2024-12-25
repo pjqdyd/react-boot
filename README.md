@@ -114,7 +114,7 @@ yarn add @pjqdyd/ract-boot
 "emitDecoratorMetadata": true,
 ```
 
-二. 编辑`react-boot.ts`文件，添加如下代码，用于定义react-boot的API及装饰器hooks：
+二. 编辑`react-boot.ts`文件，添加如下代码，用于初始配置/定义react-boot的API及装饰器hooks：
 ```ts
 import React from "react";
 import { ReactBoot } from '@pjqdyd/react-boot'
@@ -184,8 +184,19 @@ class App implements ReactBootApplication {
     }
 }
 
+// 或者使用createApp方法启动
+// const app = createApp({
+//     modules: modules,
+//     run: () => {
+//         ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+//             <React.StrictMode>
+//                 <RouterProvider router={Router} />
+//             </React.StrictMode>
+//         )
+//     }
+// })
 ```
-五. 在需要注入的组件/工具类中，使用`@Provider`装饰器或者`withProvider`hooks来修饰定义，如下：
+五. 在需要注入的组件/工具类中，使用`@Provider`装饰器或者`withProvider` hooks来定义，如下：
 ```tsx
 import React, { Component } from 'react';
 import { Provider } from "@/react-boot.ts";
@@ -237,11 +248,9 @@ class UtilsTwo {
 
 export default UtilsTwo
 ```
-六. 在需要使用组件的页面中，类组件中使用`@Consumer`装饰器，函数组件中使用`useConsumer`hooks来消费组件/工具类，如下：
+六. 在需要使用组件的页面中，类组件中使用`@Consumer`装饰器，函数组件中使用`useConsumer` hooks来消费组件/工具类，如下：
 ```tsx
 import React, { Suspense } from "react";
-import viteLogo from "/vite.svg";
-import reactBootLogo from "@/assets/react-boot.svg";
 import { Consumer } from "@/react-boot.ts";
 import type { UtilsType } from "@/utils/interface.ts";
 import type { HomeComponentProps } from "@/pages/Home/types";
@@ -307,6 +316,18 @@ class Home extends React.Component<never, IState> {
 
 export default Home
 ```
+```jsx
+// 首页组件2函数组件可既作为提供者又作为消费者
+const HomeComponentTwo = (props: HomeComponentProps) => {
+
+    // 消费HomeComponent组件
+    const [HomeComponent] = useConsumer<React.ComponentClass<HomeComponentProps>>({ name: 'HomeComponent' });
+
+    return (<HomeComponent title="组件二中使用" />);
+}
+export default withProvider<FunctionComponent>({ name: 'HomeComponentTwo' })(HomeComponentTwo);
+
+```
 运行启动项目后，访问Home首页：
 <br/>
 <img src="./src/assets/react-boot-demo.png" alt="react-boot-demo" width="750">
@@ -330,7 +351,7 @@ Consumer: (params: ConsumerParams) => (target: any, propertyKey: string, descrip
 ```
 函数中的方法：
 ```ts
-/** 创建应用启动函数 */
+/** 应用启动函数 */
 createApp: (options: AppOptions) => ReactBootApplication | void
 
 /** 提供者hooks */
@@ -339,7 +360,7 @@ withProvider: <T>(params: ProviderParams) => (target: T) => T
 /** 消费者hooks */
 useConsumer: <T>(params: ConsumerParams) => T[]
 
-/** 销毁应用函数 */
+/** 应用销毁函数 */
 destroyApp: () => void
 ```
 总结：更多详细代码请参考demo项目或者源码。
@@ -372,6 +393,9 @@ destroyApp: () => void
       有点类似@Resource(name = "name")注入名称为name的Bean
 - 类属性注入以及hooks注入采用什么方案
     - 类属性注入采用的是属性装饰器 + Object.defineProperty代理对象的get方法来实现的，hooks注入采用了React.useRef来缓存需要注入的值
+- 如何保证在多个ReactBoot应用情况下，单个应用容器的隔离，避免注入组件覆盖和消费混用
+  - 这个是在初始ReactBoot()高阶函数闭包 + Symbol符号来作为应用的key解决的，也就是说一旦在初始ReactBoot({...})时，
+    定义的name是Symbol类型，那么其他应用就无法访问该应用的组件，只能通过该应用ReactBoot()导出的API来消费，从而保证了容器的隔离
 - 日志模块自定义异常如何设计
     - 目前项目中实现了info|warn|error|system这四个级别的日志，可以控制日志的打印级别，自定义异常则是在内部继承Error来定义
 - 如果你有更好的想法或意见，欢迎提issue/pr改进，欢迎大家一起参与开源，交流学习.
