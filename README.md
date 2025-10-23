@@ -78,7 +78,7 @@
 npm install @pjqdyd/react-boot
 
 // yarn 安装
-yarn add @pjqdyd/ract-boot
+yarn add @pjqdyd/react-boot
 ```
 
 #### How to use：
