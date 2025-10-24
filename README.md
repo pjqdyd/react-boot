@@ -392,9 +392,9 @@ destroyApp: () => void
       一旦你获取到了元数据，也就意味着你加载了模块，这就是同步加载了，存在逻辑上的矛盾，
       所以要想不加载模块的前提下获取模块的元数据，那么只能通过外部配置定义的方式来，
       目前是提供了import() + withProvider这个hooks来定义异步模块的元数据
-- TS编译后命名混淆，无法获取到class name，无法使用类名注入
-    - 在Java中，可以通过类型自动注入依赖，比如：@Autowired、@Resource等，而在JS中只能使用命名注入，
-      有点类似@Resource(name = "name")注入名称为name的Bean
+- 前端TS编译运行到浏览器后命名混淆，无法获取到class name，无法使用类名注入
+    - 在Java中，可以通过类型自动注入依赖，比如：@Autowired、@Resource等，而在JS混淆后只能使用命名注入，
+      有点类似@Resource(name = "name")注入名称为name的Bean，而在node.js服务端中，通常不会混淆类型，因此可以通过类名注入
 - 类属性注入以及hooks注入采用什么方案
     - 类属性注入采用的是属性装饰器 + Object.defineProperty代理对象的get方法来实现的，hooks注入采用了React.useRef来缓存需要注入的值
 - 如何保证在多个ReactBoot应用情况下，单个应用容器的隔离，避免注入组件覆盖和消费混用
